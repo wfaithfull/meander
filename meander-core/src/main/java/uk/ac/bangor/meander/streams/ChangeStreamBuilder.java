@@ -73,12 +73,12 @@ public class ChangeStreamBuilder {
     }
 
     public Stream<Double[]> withUniformMixture() {
-        List<ProbabilisticDataSource> mixedSources = new ArrayList<>();
+        List<Pair<Double, DataSource>> mixedSources = new ArrayList<>();
 
-        double probability = 1d/ classSampler.getClasses().length;
+        double probability = 1d / classSampler.getClasses().length;
 
         for(int i = 0; i < classSampler.getClasses().length; i++) {
-            mixedSources.add(classSampler.toDataSource(probability, i));
+            mixedSources.add(Pair.of(probability, classSampler.toDataSource(i)));
         }
 
         InstantMixtureDataSource instantMixtureDataSource = new InstantMixtureDataSource(mixedSources);
