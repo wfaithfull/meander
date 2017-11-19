@@ -5,7 +5,7 @@ package uk.ac.bangor.meander.streams;
  */
 public abstract class AbstractClassSampler implements ClassSampler {
 
-    public ProbabilisticDataSource toDataSource(double probability, int label) {
+    public DataSource toDataSource(int label) {
 
         for(int i=0;i<=getClasses().length;i++) {
             if(i == getClasses().length)
@@ -15,7 +15,7 @@ public abstract class AbstractClassSampler implements ClassSampler {
                 break;
         }
 
-        return new ProbabilisticDataSource(probability, () -> this.sample(label));
+        return () -> () -> AbstractClassSampler.this.sample(label);
     }
 
 }

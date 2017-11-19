@@ -13,8 +13,7 @@ import java.util.function.Supplier;
  *
  * Represents a mixture distribution at a given instant in the data stream, i.e.
  * the probability that the next instance in the stream is drawn from class ω is
- * defined by the probability of class ω in the {@link ProbabilisticDataSource}
- * of that class.
+ * defined by the probability in the pair.
  *
  * This is intended to be a stable, immutable concept over a time-span of the
  * data stream. Changes over time in data stream concepts could  be transitions
@@ -25,20 +24,20 @@ public class InstantMixtureDataSource implements DataSource {
 
     final Random RNG = new Random(System.currentTimeMillis());
     final double EPS = 0.0000001;
-    final List<ProbabilisticDataSource> dataSources;
+    final List<Pair<Double, DataSource>> dataSources;
 
     /**
      * Create a mixture distribution of sources for a given instant of the specified
      * data sources and probabilities.
      * @param dataSources List of data sources and their respective probabilities.
      */
-    public InstantMixtureDataSource(@NonNull final List<ProbabilisticDataSource> dataSources) {
+    public InstantMixtureDataSource(@NonNull final List<Pair<Double, DataSource>> dataSources) {
         if(dataSources.isEmpty()) {
             throw new IllegalArgumentException("InstantMixtureDataSource requires at least one source!");
         }
 
         double sum = dataSources.stream().
-                mapToDouble(ds -> ds.getProbability()).sum();
+                mapToDouble(ds -> ds.getElement0()).sum();
 
         double difference = Math.abs(1 - sum);
         if(difference > EPS) {
@@ -62,11 +61,11 @@ public class InstantMixtureDataSource implements DataSource {
         Supplier<Double[]> source = null;
 
         double cumulative = 0.0;
-        for(ProbabilisticDataSource entry : this.dataSources) {
-            double probability = entry.getProbability();
+        for(Pair<Double, DataSource> entry : this.dataSources) {
+            double probability = entry.getElement0();
             cumulative += probability;
             if(choice <= cumulative) {
-                source = entry.getSource();
+                source = entry.getElement1().getSource();
                 break;
             }
         }

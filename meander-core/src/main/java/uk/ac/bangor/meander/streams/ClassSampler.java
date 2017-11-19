@@ -7,6 +7,6 @@ public interface ClassSampler {
 
     Double[] sample(int source);
     int[] getClasses();
-    ProbabilisticDataSource toDataSource(double probability, int label);
+    DataSource toDataSource(int label);
 
 }
