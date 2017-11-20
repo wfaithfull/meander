@@ -10,6 +10,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class Example {
     Double[] data;
-    int source;
+    int sequence;
     int label;
 }

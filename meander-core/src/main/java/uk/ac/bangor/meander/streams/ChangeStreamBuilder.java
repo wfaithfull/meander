@@ -28,32 +28,27 @@ public class ChangeStreamBuilder {
 
     static class ArffClassSampler extends AbstractClassSampler implements ClassSampler {
 
-        final Map<Integer, List<Instance>> instancesByClass = new HashMap<>();
+        final Map<Integer,Integer> observedClasses = new HashMap<>();
+        final List<List<Instance>> instancesByClass = new ArrayList<>();
         final Random RNG = new Random(System.currentTimeMillis());
-        final int[] classes;
 
         public ArffClassSampler(BufferedReader file) throws IOException {
             Instances instances = new Instances(file);
             instances.setClassIndex(instances.numAttributes() - 1);
 
             for(Instance instance: instances) {
-                if(!instancesByClass.containsKey(instance.classValue())) {
-                    instancesByClass.put((int) instance.classValue(), Arrays.asList(instance));
+                if(!observedClasses.containsKey(instance.classValue())) {
+                    instancesByClass.add(Arrays.asList(instance));
+                    observedClasses.put((int)instance.classValue(), instancesByClass.size());
                 } else {
-                    instancesByClass.get((int) instance.classValue()).add(instance);
+                    instancesByClass.get(observedClasses.get((int)instance.classValue())).add(instance);
                 }
-            }
-
-            classes = new int[instancesByClass.size()];
-            Iterator<Integer> classesIterator = instancesByClass.keySet().iterator();
-            for(int i=0;i<instancesByClass.size();i++) {
-                classes[i] = classesIterator.next();
             }
         }
 
         @Override
-        public Double[] sample(int source) {
-            List<Instance> choices = instancesByClass.get(source);
+        public Double[] sample(int label) {
+            List<Instance> choices = instancesByClass.get(label);
             int choice = RNG.nextInt(choices.size());
             Instance chosen = choices.get(choice);
 
@@ -67,17 +62,17 @@ public class ChangeStreamBuilder {
         }
 
         @Override
-        public int[] getClasses() {
-            return classes;
+        public int getClasses() {
+            return instancesByClass.size();
         }
     }
 
     public Stream<Double[]> withUniformMixture() {
         List<Pair<Double, DataSource>> mixedSources = new ArrayList<>();
 
-        double probability = 1d / classSampler.getClasses().length;
+        double probability = 1d / classSampler.getClasses();
 
-        for(int i = 0; i < classSampler.getClasses().length; i++) {
+        for(int i = 0; i < classSampler.getClasses(); i++) {
             mixedSources.add(Pair.of(probability, classSampler.toDataSource(i)));
         }
 

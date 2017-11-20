@@ -5,8 +5,8 @@ package uk.ac.bangor.meander.streams;
  */
 public interface ClassSampler {
 
-    Double[] sample(int source);
-    int[] getClasses();
+    Double[] sample(int label);
+    int getClasses();
     DataSource toDataSource(int label);
 
 }
