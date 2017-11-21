@@ -10,6 +10,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class Example {
     Double[] data;
-    int sequence;
-    int label;
+    StreamContext context;
 }

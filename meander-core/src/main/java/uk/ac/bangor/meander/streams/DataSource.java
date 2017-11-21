@@ -1,12 +1,12 @@
 package uk.ac.bangor.meander.streams;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * @author Will Faithfull
  */
-public interface DataSource {
+interface DataSource {
 
-    Supplier<Double[]> getSource();
+    Function<StreamContext, Example> getSource();
 
 }

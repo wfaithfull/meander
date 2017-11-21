@@ -1,4 +1,5 @@
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
+import uk.ac.bangor.meander.streams.Example;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,10 +12,18 @@ import java.util.stream.Stream;
 public class ArffStreamTest {
 
     public static void main(String[] args) throws IOException {
-        Stream<Double[]> arffStream = ChangeStreamBuilder
+        Stream<Example> arffStream = ChangeStreamBuilder
                 .fromArff(new InputStreamReader(ArffStreamTest.class.getResourceAsStream("abalone.arff")))
-                .withUniformMixture();
+                .withClassMixture(0, 0.5, 0.5).fromStart()
+                .withClassMixture(1.0, 0.0, 0.0).at(33)
+                .withUniformClassMixture().at(66)
+                .build();
 
-        arffStream.limit(1000).forEach(x -> System.out.println(Arrays.toString(x)));
+        arffStream.limit(100).forEach(x -> System.out.println(String.format(
+                "i=%-5d|S=%-2d|ω=%-2d| %s",
+                x.getContext().getIndex(),
+                x.getContext().getSequence(),
+                x.getContext().getLabel(),
+                Arrays.toString(x.getData()))));
     }
 }

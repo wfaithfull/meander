@@ -3,10 +3,11 @@ package uk.ac.bangor.meander.streams;
 /**
  * @author Will Faithfull
  */
-public interface ClassSampler {
+interface ClassSampler {
 
     Double[] sample(int label);
     int getClasses();
+    double[] getDistribution();
     DataSource toDataSource(int label);
 
 }

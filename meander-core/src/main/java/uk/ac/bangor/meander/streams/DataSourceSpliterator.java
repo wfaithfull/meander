@@ -8,22 +8,25 @@ import java.util.function.Consumer;
 /**
  * @author Will Faithfull
  */
-public class DataSourceSpliterator implements Spliterator<Double[]> {
+class DataSourceSpliterator implements Spliterator<Example> {
 
     private DataSource source;
+    private StreamContext context;
 
-    public DataSourceSpliterator(@NonNull final DataSource source) {
+    DataSourceSpliterator(@NonNull final DataSource source) {
         this.source = source;
+        this.context = StreamContext.START;
     }
 
     @Override
-    public boolean tryAdvance(Consumer<? super Double[]> action) {
-        action.accept(source.getSource().get());
+    public boolean tryAdvance(Consumer<? super Example> action) {
+        context.advance();
+        action.accept(source.getSource().apply(context));
         return true;
     }
 
     @Override
-    public Spliterator<Double[]> trySplit() {
+    public Spliterator<Example> trySplit() {
         return null;
     }
 
