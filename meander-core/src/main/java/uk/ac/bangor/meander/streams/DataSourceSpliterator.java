@@ -20,8 +20,8 @@ class DataSourceSpliterator implements Spliterator<Example> {
 
     @Override
     public boolean tryAdvance(Consumer<? super Example> action) {
-        context.advance();
         action.accept(source.getSource().apply(context));
+        context.advance();
         return true;
     }
 

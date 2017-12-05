@@ -75,7 +75,7 @@ class MixtureDataSource implements DataSource {
         double choice = RNG.nextDouble();
         Function<StreamContext, Example> source = null;
 
-        double[] distribution = mixtureProvider.getDistribution(StreamContext.START);
+        double[] distribution = mixtureProvider.getDistribution(context);
 
         double cumulative = 0.0;
         int label = 0;
@@ -93,6 +93,12 @@ class MixtureDataSource implements DataSource {
             context.setLabel(label);
         } else {
             context.setSequence(label);
+            context.setSourcePriors(distribution);
+
+            for(DataSource dataSource : dataSources) {
+                double[] classPriors = ((MixtureDataSource)dataSource).mixtureProvider.getDistribution(context);
+                context.setClassPriors(classPriors);
+            }
         }
 
         assert source != null;
