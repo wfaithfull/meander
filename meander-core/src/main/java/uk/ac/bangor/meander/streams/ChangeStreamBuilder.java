@@ -103,6 +103,7 @@ public class ChangeStreamBuilder {
     }
 
     public Stream<Example> build() {
+        this.context = new StreamContext();
         sequenceExampleProviderFactory = MixtureDistribution.ofSources(this.classExampleProviderFactories,
                 new SequentialMixingFunction(transitions), context);
         return StreamSupport.stream(new ExampleSpliterator(sequenceExampleProviderFactory, context), false);
