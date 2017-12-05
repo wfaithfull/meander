@@ -6,12 +6,17 @@ import java.util.Arrays;
 
 /**
  * @author Will Faithfull
+ *
+ * A transition between distributions which uses a linear function to transition between distributions p1 and p2.
  */
 public class LinearTransition extends AbstractTransition {
 
     private double[] distribution;
     private double[] increments;
 
+    /**
+     * {@inheritDoc}
+     */
     public LinearTransition(int start, int end) {
         super(start, end);
 
@@ -19,6 +24,9 @@ public class LinearTransition extends AbstractTransition {
             throw new MeanderException("Transition must have a duration");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void prepare(double[] p1, double[] p2) {
         super.prepare(p1, p2);
@@ -36,6 +44,9 @@ public class LinearTransition extends AbstractTransition {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected double[] mixture(long index) {
         for(int i=0;i<getP1().length;i++) {

@@ -6,6 +6,10 @@ import java.util.Arrays;
 
 /**
  * @author Will Faithfull
+ *
+ * A transition between distributions which uses a logistic function to phase out p1 and phase in p2.
+ *
+ * f(x) = 1 / (1 + exp(-k(x-x_0)))
  */
 public class LogisticTransition extends AbstractTransition {
 
@@ -14,10 +18,16 @@ public class LogisticTransition extends AbstractTransition {
     private double[] difference;
     long duration;
 
+    /**
+     * {@inheritDoc}
+     */
     public LogisticTransition(long start, long end) {
         this(start, end, 1);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public LogisticTransition(long start, long end, int k) {
         super(start, end);
 
@@ -27,6 +37,9 @@ public class LogisticTransition extends AbstractTransition {
         this.k = k;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void prepare(double[] p1, double[] p2) {
         super.prepare(p1, p2);
@@ -43,6 +56,9 @@ public class LogisticTransition extends AbstractTransition {
         duration = 2 + (getEnd() - getStart());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected double[] mixture(long index) {
 
