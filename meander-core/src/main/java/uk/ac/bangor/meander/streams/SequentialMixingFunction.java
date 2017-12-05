@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author Will Faithfull
  *
- * Mixture provider that provides a sequential distribution based on the provided transitions, e.g. for changes
+ * Mixing function that provides a sequential distribution based on the provided transitions, e.g. for changes
  * at indices 0, 1 and 2, we would get the following distribution:
  *
  * t=0 [ 1.0, 0.0, 0.0 ]
@@ -23,6 +23,11 @@ class SequentialMixingFunction implements MixingFunction {
     private Transition  pointer;
     private int         sequence;
 
+    /**
+     * Create a sequential mixing function from the provided transitions. This will have {@code transitions + 1}
+     * entries in it's distribution.
+     * @param transitions Transitions to modify the mixing proportions over time.
+     */
     SequentialMixingFunction(List<Transition> transitions) {
         for(Transition transition : transitions) {
             this.transitions.add(transition);
@@ -34,6 +39,9 @@ class SequentialMixingFunction implements MixingFunction {
         p2[1] = 1.0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double[] getDistribution(StreamContext context) {
 
