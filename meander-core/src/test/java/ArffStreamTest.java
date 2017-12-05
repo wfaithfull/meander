@@ -3,6 +3,7 @@ import uk.ac.bangor.meander.streams.Example;
 import uk.ac.bangor.meander.streams.StreamContext;
 import uk.ac.bangor.meander.transitions.AbruptTransition;
 import uk.ac.bangor.meander.transitions.LinearTransition;
+import uk.ac.bangor.meander.transitions.LogisticTransition;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,7 +21,7 @@ public class ArffStreamTest {
                 .withClassMixture(0, 0.5, 0.5).fromStart()
                 .withClassMixture(1.0, 0.0, 0.0).transition(new LinearTransition(20,33))
                 .withClassMixture(0.0, 0.0, 1.0).transition(new AbruptTransition(50))
-                .withUniformClassMixture().transition(new LinearTransition(60,70))
+                .withUniformClassMixture().transition(new LogisticTransition(60,70))
                 .build();
 
         arffStream.limit(100).forEach(x -> {
