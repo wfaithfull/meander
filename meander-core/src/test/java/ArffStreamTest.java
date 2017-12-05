@@ -26,11 +26,11 @@ public class ArffStreamTest {
         arffStream.limit(100).forEach(x -> {
             StreamContext ctx = x.getContext();
             System.out.println(String.format(
-                    "i=%-5d|S=%-2d|ω=%-2d| %-35s| %-35s| %-35s| %s",
+                    "i=%-5d|S=%-2d|ω=%-2d| %-20s| %-35s| %-35s| %s",
                     ctx.getIndex(),
                     ctx.getSequence(),
                     ctx.getLabel(),
-                    ctx.getCurrentTransition().isPresent() ? ctx.getCurrentTransition().get() : "",
+                    ctx.getCurrentTransition().isPresent() ? ctx.getCurrentTransition().get().getClass().getSimpleName() : "",
                     doubleArrayToString(ctx.getSourcePriors(), "%.2f"),
                     doubleArrayToString(ctx.getClassPriors(), "%.2f"),
                     Arrays.toString(x.getData())));

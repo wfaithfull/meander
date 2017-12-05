@@ -11,7 +11,7 @@ public class AbruptTransition extends AbstractTransition {
 
     @Override
     protected double[] mixture(long index) {
-        if(index <= getStart()) {
+        if(index < getStart()) {
             return getP1();
         } else {
             return getP2();
