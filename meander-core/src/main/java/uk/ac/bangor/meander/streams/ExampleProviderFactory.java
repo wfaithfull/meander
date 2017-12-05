@@ -2,9 +2,15 @@ package uk.ac.bangor.meander.streams;
 
 /**
  * @author Will Faithfull
+ *
+ * Factory interface for {@link ExampleProvider}s.
  */
 interface ExampleProviderFactory {
 
-    ExampleProvider getSource();
+    /**
+     * Create a new {@link ExampleProvider}.
+     * @return An {@link ExampleProvider}.
+     */
+    ExampleProvider getProvider();
 
 }
