@@ -3,7 +3,7 @@ package uk.ac.bangor.meander.streams;
 /**
  * @author Will Faithfull
  */
-interface MixtureProvider {
+interface MixingFunction {
 
     double[] getDistribution(StreamContext context);
 

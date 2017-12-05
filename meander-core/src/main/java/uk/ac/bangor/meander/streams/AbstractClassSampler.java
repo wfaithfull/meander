@@ -5,7 +5,7 @@ package uk.ac.bangor.meander.streams;
  */
 abstract class AbstractClassSampler implements ClassSampler {
 
-    public DataSource toDataSource(int label) {
+    public ExampleProviderFactory toDataSource(int label) {
         if(label > getClasses())
             throw new IllegalArgumentException("Class \"" + label + "\" was not found in this sampler.");
 

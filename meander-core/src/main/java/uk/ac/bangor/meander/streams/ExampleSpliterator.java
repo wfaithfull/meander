@@ -8,12 +8,12 @@ import java.util.function.Consumer;
 /**
  * @author Will Faithfull
  */
-class DataSourceSpliterator implements Spliterator<Example> {
+class ExampleSpliterator implements Spliterator<Example> {
 
-    private DataSource source;
-    private StreamContext context;
+    private ExampleProviderFactory source;
+    private StreamContext          context;
 
-    DataSourceSpliterator(@NonNull final DataSource source) {
+    ExampleSpliterator(@NonNull final ExampleProviderFactory source) {
         this.source = source;
         this.context = StreamContext.START;
     }

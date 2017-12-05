@@ -7,9 +7,15 @@ import java.util.List;
 
 /**
  * @author Will Faithfull
+ *
+ * Mixture provider that provides a sequential distribution based on the provided transitions, e.g. for changes
+ * at indices 0, 1 and 2, we would get the following distribution:
+ *
+ * t=0 [ 1.0, 0.0, 0.0 ]
+ * t=1 [ 0.0, 1.0, 0.0 ]
+ * t=2 [ 0.0, 0.0, 1.0 ]
  */
-
-class SequentialMixtureProvider implements MixtureProvider {
+class SequentialMixingFunction implements MixingFunction {
 
     private double[] p1;
     private double[] p2;
@@ -17,7 +23,7 @@ class SequentialMixtureProvider implements MixtureProvider {
     private Transition  pointer;
     private int         sequence;
 
-    SequentialMixtureProvider(List<Transition> transitions) {
+    SequentialMixingFunction(List<Transition> transitions) {
         for(Transition transition : transitions) {
             this.transitions.add(transition);
         }

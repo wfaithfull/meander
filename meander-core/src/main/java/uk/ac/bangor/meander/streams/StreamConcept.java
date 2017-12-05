@@ -8,6 +8,6 @@ package uk.ac.bangor.meander.streams;
 enum StreamConcept {
 
     CLASS,
-    SEQUENCE
+    SOURCE
 
 }

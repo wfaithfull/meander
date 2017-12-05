@@ -5,8 +5,5 @@ import java.util.function.Function;
 /**
  * @author Will Faithfull
  */
-interface DataSource {
-
-    Function<StreamContext, Example> getSource();
-
+public interface ExampleProvider extends Function<StreamContext, Example> {
 }

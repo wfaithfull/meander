@@ -8,6 +8,6 @@ interface ClassSampler {
     Double[] sample(int label);
     int getClasses();
     double[] getDistribution();
-    DataSource toDataSource(int label);
+    ExampleProviderFactory toDataSource(int label);
 
 }

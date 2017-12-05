@@ -14,19 +14,19 @@ import java.util.stream.StreamSupport;
 
 /**
  * @author Will Faithfull
+ *
+ * Builder class for generating changing data streams. Primary API entry point.
  */
 public class ChangeStreamBuilder {
 
-    private ClassSampler classSampler;
-    private List<DataSource> classDataSources;
-    private List<Long> sequenceIndices;
-    private List<Transition> transitions;
-    private DataSource sequenceDataSource;
+    private ClassSampler                 classSampler;
+    private List<ExampleProviderFactory> classExampleProviderFactories;
+    private List<Transition>             transitions;
+    private ExampleProviderFactory       sequenceExampleProviderFactory;
 
     private ChangeStreamBuilder(ClassSampler classSampler) {
         this.classSampler = classSampler;
-        this.classDataSources = new ArrayList<>();
-        this.sequenceIndices = new ArrayList<>();
+        this.classExampleProviderFactories = new ArrayList<>();
         this.transitions = new ArrayList<>();
     }
 
@@ -38,9 +38,8 @@ public class ChangeStreamBuilder {
         return fromArff(new InputStreamReader(ChangeStreamBuilder.class.getClassLoader().getResourceAsStream(file)));
     }
 
-
     public SequenceBuilder withUniformClassMixture() {
-        List<DataSource> mixedSources = new ArrayList<>();
+        List<ExampleProviderFactory> mixedSources = new ArrayList<>();
         double[] distribution = new double[classSampler.getClasses()];
 
         double probability = 1d / classSampler.getClasses();
@@ -50,56 +49,56 @@ public class ChangeStreamBuilder {
             distribution[i] = probability;
         }
 
-        DataSource dataSource = MixtureDataSource.ofClasses(mixedSources, context -> distribution);
-        return new SequenceBuilder(dataSource);
+        ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources, context -> distribution);
+        return new SequenceBuilder(exampleProviderFactory);
     }
 
     public SequenceBuilder withClassMixture(Function<Integer, double[]> distributionFunction) {
-        List<DataSource> mixedSources = new ArrayList<>();
+        List<ExampleProviderFactory> mixedSources = new ArrayList<>();
         for(int i = 0; i < classSampler.getClasses(); i++) {
             mixedSources.add(classSampler.toDataSource(i));
         }
-        DataSource dataSource = MixtureDataSource.ofClasses(mixedSources, context -> distributionFunction.apply(mixedSources.size()));
-        return new SequenceBuilder(dataSource);
+        ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources, context -> distributionFunction.apply(mixedSources.size()));
+        return new SequenceBuilder(exampleProviderFactory);
     }
 
     public SequenceBuilder withClassMixture(double... distribution) {
-        List<DataSource> mixedSources = new ArrayList<>();
+        List<ExampleProviderFactory> mixedSources = new ArrayList<>();
         for(int i = 0; i < classSampler.getClasses(); i++) {
             mixedSources.add(classSampler.toDataSource(i));
         }
-        DataSource dataSource = MixtureDataSource.ofClasses(mixedSources, context -> distribution);
-        return new SequenceBuilder(dataSource);
+        ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources, context -> distribution);
+        return new SequenceBuilder(exampleProviderFactory);
     }
 
     public class SequenceBuilder {
-        DataSource dataSource;
+        ExampleProviderFactory exampleProviderFactory;
 
-        private SequenceBuilder(DataSource dataSource) {
-            this.dataSource = dataSource;
+        private SequenceBuilder(ExampleProviderFactory exampleProviderFactory) {
+            this.exampleProviderFactory = exampleProviderFactory;
         }
 
         public ChangeStreamBuilder fromStart() {
-            if(!ChangeStreamBuilder.this.classDataSources.isEmpty()) {
+            if(!ChangeStreamBuilder.this.classExampleProviderFactories.isEmpty()) {
                 throw new IllegalStateException("There is already a starting data source configured.");
             }
-            ChangeStreamBuilder.this.classDataSources.add(dataSource);
+            ChangeStreamBuilder.this.classExampleProviderFactories.add(exampleProviderFactory);
             return ChangeStreamBuilder.this;
         }
 
         public ChangeStreamBuilder transition(Transition transition) {
-            if(ChangeStreamBuilder.this.classDataSources.isEmpty()) {
+            if(ChangeStreamBuilder.this.classExampleProviderFactories.isEmpty()) {
                 throw new IllegalStateException("There must be a starting data source configured to transition between.");
             }
-            ChangeStreamBuilder.this.classDataSources.add(dataSource);
+            ChangeStreamBuilder.this.classExampleProviderFactories.add(exampleProviderFactory);
             ChangeStreamBuilder.this.transitions.add(transition);
             return ChangeStreamBuilder.this;
         }
     }
 
     public Stream<Example> build() {
-        sequenceDataSource = MixtureDataSource.ofSequences(this.classDataSources, new SequentialMixtureProvider(transitions));
-        return StreamSupport.stream(new DataSourceSpliterator(sequenceDataSource), false);
+        sequenceExampleProviderFactory = MixtureDistribution.ofSources(this.classExampleProviderFactories, new SequentialMixingFunction(transitions));
+        return StreamSupport.stream(new ExampleSpliterator(sequenceExampleProviderFactory), false);
     }
 
 }

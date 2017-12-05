@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * @author Will Faithfull
@@ -21,31 +20,31 @@ import java.util.function.Supplier;
  * at these data sources.
  */
 @Log
-class MixtureDataSource implements DataSource {
+class MixtureDistribution implements ExampleProviderFactory {
 
     private final Random RNG = new Random(System.currentTimeMillis());
     private final double EPS = 0.0000001;
-    private final List<DataSource> dataSources;
-    private final MixtureProvider mixtureProvider;
-    private final StreamConcept concept;
+    private final List<ExampleProviderFactory> exampleProviderFactories;
+    private final MixingFunction               mixingFunction;
+    private final StreamConcept                concept;
 
     /**
      * Create a mixture distribution of sources for a given instant of the specified
      * data sources and probabilities.
-     * @param dataSources List of data sources and their respective probabilities.
+     * @param exampleProviderFactories List of data sources and their respective probabilities.
      */
-    private MixtureDataSource(@NonNull final List<DataSource> dataSources,
-                              @NonNull final MixtureProvider mixtureProvider,
-                              @NonNull final StreamConcept concept) {
-        this.mixtureProvider = mixtureProvider;
+    private MixtureDistribution(@NonNull final List<ExampleProviderFactory> exampleProviderFactories,
+                                @NonNull final MixingFunction mixingFunction,
+                                @NonNull final StreamConcept concept) {
+        this.mixingFunction = mixingFunction;
         this.concept = concept;
-        if(dataSources.isEmpty()) {
+        if(exampleProviderFactories.isEmpty()) {
             throw new IllegalArgumentException("InstantMixtureDataSource requires at least one source!");
         }
 
-        double[] distribution = mixtureProvider.getDistribution(StreamContext.START);
+        double[] distribution = mixingFunction.getDistribution(StreamContext.START);
 
-        if(distribution.length != dataSources.size()) {
+        if(distribution.length != exampleProviderFactories.size()) {
             throw new IllegalArgumentException("Distribution must be over the data sources (must be same number of elements)");
         }
 
@@ -59,11 +58,11 @@ class MixtureDataSource implements DataSource {
             throw new IllegalArgumentException("InstantMixtureDataSource probabilities must sum to 1 (" + sum + ")");
         }
 
-        if(dataSources.size() == 1) {
+        if(exampleProviderFactories.size() == 1) {
             log.warning("Only 1 source supplied (p = 1.0) - why bother using a mixture distribution?");
         }
 
-        this.dataSources = Collections.unmodifiableList(dataSources);
+        this.exampleProviderFactories = Collections.unmodifiableList(exampleProviderFactories);
     }
 
     /**
@@ -75,7 +74,7 @@ class MixtureDataSource implements DataSource {
         double choice = RNG.nextDouble();
         Function<StreamContext, Example> source = null;
 
-        double[] distribution = mixtureProvider.getDistribution(context);
+        double[] distribution = mixingFunction.getDistribution(context);
 
         double cumulative = 0.0;
         int label = 0;
@@ -84,7 +83,7 @@ class MixtureDataSource implements DataSource {
             cumulative += probability;
             if(choice <= cumulative) {
                 label = i;
-                source = dataSources.get(label).getSource();
+                source = exampleProviderFactories.get(label).getSource();
                 break;
             }
         }
@@ -95,8 +94,8 @@ class MixtureDataSource implements DataSource {
             context.setSequence(label);
             context.setSourcePriors(distribution);
 
-            for(DataSource dataSource : dataSources) {
-                double[] classPriors = ((MixtureDataSource)dataSource).mixtureProvider.getDistribution(context);
+            for(ExampleProviderFactory exampleProviderFactory : exampleProviderFactories) {
+                double[] classPriors = ((MixtureDistribution) exampleProviderFactory).mixingFunction.getDistribution(context);
                 context.setClassPriors(classPriors);
             }
         }
@@ -109,17 +108,17 @@ class MixtureDataSource implements DataSource {
      * {@inheritDoc}
      */
     @Override
-    public Function<StreamContext, Example> getSource() {
+    public ExampleProvider getSource() {
         return context -> new Example(sample(context), context);
     }
 
-    static DataSource ofClasses(@NonNull final List<DataSource> dataSources,
-                                @NonNull final MixtureProvider mixtureProvider) {
-        return new MixtureDataSource(dataSources, mixtureProvider, StreamConcept.CLASS);
+    static ExampleProviderFactory ofClasses(@NonNull final List<ExampleProviderFactory> exampleProviderFactories,
+                                            @NonNull final MixingFunction mixingFunction) {
+        return new MixtureDistribution(exampleProviderFactories, mixingFunction, StreamConcept.CLASS);
     }
 
-    static DataSource ofSequences(@NonNull final List<DataSource> dataSources,
-                                  @NonNull final MixtureProvider mixtureProvider) {
-        return new MixtureDataSource(dataSources, mixtureProvider, StreamConcept.SEQUENCE);
+    static ExampleProviderFactory ofSources(@NonNull final List<ExampleProviderFactory> exampleProviderFactories,
+                                            @NonNull final MixingFunction mixingFunction) {
+        return new MixtureDistribution(exampleProviderFactories, mixingFunction, StreamConcept.SOURCE);
     }
 }
