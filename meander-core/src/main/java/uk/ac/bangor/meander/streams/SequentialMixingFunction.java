@@ -29,14 +29,18 @@ class SequentialMixingFunction implements MixingFunction {
      * @param transitions Transitions to modify the mixing proportions over time.
      */
     SequentialMixingFunction(List<Transition> transitions) {
-        for(Transition transition : transitions) {
+
+        for (Transition transition : transitions) {
             this.transitions.add(transition);
         }
 
-        p1 = new double[transitions.size()+1];
-        p2 = new double[transitions.size()+1];
+        p1 = new double[transitions.size() + 1];
+        p2 = new double[transitions.size() + 1];
         p1[0] = 1.0;
-        p2[1] = 1.0;
+
+        if(!transitions.isEmpty()) {
+            p2[1] = 1.0;
+        }
     }
 
     /**
