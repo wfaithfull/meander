@@ -8,7 +8,7 @@ import uk.ac.bangor.meander.detectors.windowing.FixedWindowPair;
  * @author Will Faithfull
  */
 @Log
-public class SPLL extends AbstractKMeansQuantizingDetector {
+public class SPLL extends AbstractKMeansQuantizingDetector implements ReductionFunction, DecisionFunction {
 
     ChiSquaredDistribution cdf;
 
@@ -17,8 +17,22 @@ public class SPLL extends AbstractKMeansQuantizingDetector {
     }
 
     @Override
-    protected boolean change(double[] p1, double[] p2) {
+    public double reduce(Double[] example) {
+        super.update(example);
 
+        double[] distances = getMinClusterToObservationDistances();
+        if(distances == null)
+            return 0;
+
+        double likelihoodTerm = 0;
+        for(int i=0;i<distances.length;i++) {
+            likelihoodTerm += distances[i];
+        }
+        return likelihoodTerm / distances.length;
+    }
+
+    @Override
+    public boolean decide(Double statistic) {
         if(cdf == null) {
             int df = getNFeatures();
 
@@ -28,18 +42,10 @@ public class SPLL extends AbstractKMeansQuantizingDetector {
             cdf = new ChiSquaredDistribution(df);
         }
 
-        double[] distances = getMinClusterToObservationDistances();
-        double likelihoodTerm = 0;
-        for(int i=0;i<distances.length;i++) {
-            likelihoodTerm += distances[i];
-        }
-        likelihoodTerm = likelihoodTerm / distances.length;
-
-        double cumulativeProbability = cdf.cumulativeProbability(likelihoodTerm);
+        double cumulativeProbability = cdf.cumulativeProbability(statistic);
         if((1-cumulativeProbability) < cumulativeProbability)
             cumulativeProbability = 1-cumulativeProbability;
 
         return cumulativeProbability < 0.05;
     }
-
 }

@@ -46,7 +46,6 @@ public class BasicEvaluator implements Evaluator {
 
         Transition transition = null;
 
-        log.info("Starting evaluation of " + detector.getClass().getSimpleName() + "...");
         while(iterator.hasNext() && n < MAX_N) {
             Example example = iterator.next();
             StreamContext ctx = example.getContext();
@@ -75,9 +74,6 @@ public class BasicEvaluator implements Evaluator {
                 }
             }
 
-            if(n % 5000 == 0 && n > 0) {
-                log.info("Processed " + n + " examples.");
-            }
             if(n > 100000) {
                 log.warning("Did you forget to limit the stream? I will technically keep going until n=" + MAX_N);
             }
@@ -86,8 +82,6 @@ public class BasicEvaluator implements Evaluator {
         }
 
         idealARL = idealARL / transitions.size();
-
-        log.info("Processed " + n + " examples total.");
 
         return new Evaluation(n, transitions, detections, ttds, runLengths, falseAlarms, idealARL);
     }

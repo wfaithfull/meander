@@ -3,6 +3,7 @@ package uk.ac.bangor.meander.detectors;
 /**
  * @author Will Faithfull
  */
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -18,7 +19,6 @@ import org.apache.commons.math3.stat.correlation.Covariance;
 import uk.ac.bangor.meander.detectors.windowing.FixedWindowPair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -37,14 +37,11 @@ import java.util.stream.Collectors;
  * This uses the Apache commons KMeansPlusPlusClusterer for clustering, although in theory it should be straightforward
  * to substitute this for another clustering algorithm.
  */
-public abstract class AbstractKMeansQuantizingDetector implements Detector<Double[]> {
+public abstract class AbstractKMeansQuantizingDetector {
 
     protected final FixedWindowPair<double[]>            windowPair;
     private final   KMeansPlusPlusClusterer<DoublePoint> clusterer;
     protected final int                                  K;
-
-    @Getter
-    private boolean change;
 
     @Getter(AccessLevel.PROTECTED)
     private List<Double> classPriors;
@@ -63,6 +60,9 @@ public abstract class AbstractKMeansQuantizingDetector implements Detector<Doubl
 
     private double[][] covariance;
 
+    protected double[] p1;
+    protected double[] p2;
+
     public AbstractKMeansQuantizingDetector(FixedWindowPair<double[]> windowPair) {
         this(windowPair, 3);
     }
@@ -74,7 +74,7 @@ public abstract class AbstractKMeansQuantizingDetector implements Detector<Doubl
         nObservations = windowPair.getWindow1().capacity();
     }
 
-    protected List<CentroidCluster<DoublePoint>> cluster(double[][] w1, double[][] w2) {
+    protected List<CentroidCluster<DoublePoint>> cluster(double[][] w1) {
         List<DoublePoint> adaptedPoints = new ArrayList<>();
         for(double[] point : w1) {
             adaptedPoints.add(new DoublePoint(point));
@@ -121,54 +121,8 @@ public abstract class AbstractKMeansQuantizingDetector implements Detector<Doubl
         return clusters;
     }
 
-    protected List<CentroidCluster<DoublePoint>> cluster(FixedWindowPair<double[]> windowPair) {
-
-        List<DoublePoint> adaptedPoints = Arrays.asList(windowPair.getWindow1().getElements())
-                .stream()
-                .map(DoublePoint::new)
-                .collect(Collectors.toList());
-
-        List<CentroidCluster<DoublePoint>> clusters = clusterer.cluster(adaptedPoints);
-
-        classPriors = new ArrayList<>();
-        clusterMeans = new ArrayList<>();
-        priorWeightedClusterCovariance = new ArrayList<>();
-
-        int totalObservations   = windowPair.getWindow1().size();
-        int nFeatures           = windowPair.getWindow1().getOldest().length;
-
-        double[][] dataArray = windowPair.getWindow1().getElements();
-        covariance = new Covariance(dataArray).getCovarianceMatrix().getData();
-
-        // Calculate the REFERENCE distribution from Window 1
-        for(CentroidCluster<DoublePoint> cluster : clusters) {
-            double nObservations       = cluster.getPoints().size();
-            double[] center         = cluster.getCenter().getPoint();
-
-            clusterMeans.add(center);
-            double prior = nObservations / totalObservations;
-            classPriors.add(prior);
-
-            List<DoublePoint> data = cluster.getPoints();
-
-            double[][] clusterData = CollectionUtils.toArray(data.stream().map(x -> x.getPoint()).collect(Collectors.toList()));
-
-            RealMatrix clusterCovariance;
-            if(nObservations == 1.0) {
-                clusterCovariance = new Array2DRowRealMatrix(nFeatures, nFeatures);
-            } else {
-                clusterCovariance = new Covariance(clusterData).getCovarianceMatrix();
-            }
-
-            clusterCovariance = clusterCovariance.scalarMultiply(prior);
-            priorWeightedClusterCovariance.add(clusterCovariance);
-        }
-        return clusters;
-    }
-
     ThreadLocalRandom random = ThreadLocalRandom.current();
 
-    @Override
     public void update(Double[] input) {
         double[] unboxed = new double[input.length];
         for(int i=0;i<input.length;i++) {
@@ -188,14 +142,14 @@ public abstract class AbstractKMeansQuantizingDetector implements Detector<Doubl
 
         this.nFeatures = window1[0].length;
 
-        List<CentroidCluster<DoublePoint>> clusters = cluster(window1, window2);
+        List<CentroidCluster<DoublePoint>> clusters = cluster(window1);
         double totalObservations = (double)window1.length;
 
         /**
          * Calculate the reference distribution (P1) from window 1, i.e. the population of the K clusters.
          */
-        double[] p1 = clusters.stream().mapToDouble(c -> c.getPoints().size() / totalObservations).toArray();
-        double[] p2 = new double[clusters.size()];
+        p1 = clusters.stream().mapToDouble(c -> c.getPoints().size() / totalObservations).toArray();
+        p2 = new double[clusters.size()];
         minClusterToObservationDistances = new double[(int)totalObservations];
 
         RealMatrix finalCovariance = new Array2DRowRealMatrix(nFeatures, nFeatures);
@@ -251,8 +205,6 @@ public abstract class AbstractKMeansQuantizingDetector implements Detector<Doubl
         for(int i=0;i<K;i++) {
             p2[i] /= w2Observations;
         }
-
-        this.change = change(p1, p2);
     }
 
     private static double min(RealMatrix matrix) {
@@ -277,10 +229,4 @@ public abstract class AbstractKMeansQuantizingDetector implements Detector<Doubl
             throw new RuntimeException("Distance calculation included NaN term");
         return dist;
     }
-
-    public boolean isChangeDetected() {
-        return change;
-    }
-
-    protected abstract boolean change(double[] p1, double[] p2);
 }
