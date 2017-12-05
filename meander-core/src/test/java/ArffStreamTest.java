@@ -58,6 +58,7 @@ public class ArffStreamTest {
             counter++;
         }
 
+        Assert.assertEquals(n, counter);
     }
 
     @Test
@@ -88,6 +89,7 @@ public class ArffStreamTest {
             counter++;
         }
 
+        Assert.assertEquals(n, counter);
     }
 
     @Test
@@ -118,6 +120,46 @@ public class ArffStreamTest {
             counter++;
         }
 
+        Assert.assertEquals(n, counter);
+    }
+
+    @Test
+    public void testMultipleTransitions() throws IOException {
+
+        int L = 10;
+        int C = 50;
+
+        Stream<Example> arffStream = ChangeStreamBuilder
+                .fromArff("abalone.arff")
+                .withUniformClassMixture().fromStart()
+                .withClassMixture(1.0, 0.0, 0.0).transition(new LogisticTransition(C, C + L))
+                .withClassMixture(0.0, 1.0, 0.0).transition(new LinearTransition(C*2, (C*2)+L))
+                .withClassMixture(0.0, 0.0, 1.0).transition(new AbruptTransition(C*3))
+                .build();
+
+        int n = 300;
+        int counter = 0;
+
+        Iterator<Example> iterator = arffStream.limit(n).iterator();
+        while (iterator.hasNext()){
+            Example example = iterator.next();
+
+            if(counter < C) {
+                Assert.assertTrue(example.getContext().getSequence() == 0);
+            } else if (counter > C+L && counter < C*2) {
+                Assert.assertTrue(example.getContext().getSequence() == 1);
+                Assert.assertTrue(example.getContext().getLabel() == 0);
+            } else if (counter > C*2+L && counter < C*3) {
+                Assert.assertTrue(example.getContext().getSequence() == 2);
+                Assert.assertTrue(example.getContext().getLabel() == 1);
+            } else if (counter > C*3) {
+                Assert.assertTrue(example.getContext().getSequence() == 3);
+                Assert.assertTrue(example.getContext().getLabel() == 2);
+            }
+            counter++;
+        }
+
+        Assert.assertEquals(n, counter);
     }
 
 }
