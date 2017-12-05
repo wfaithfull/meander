@@ -34,7 +34,7 @@ these classes, change gradually to `[1.0 0.0 .0.0]` over indices `20..33`, chang
 
 ```
 Stream<Example> arffStream = ChangeStreamBuilder
-        .fromArff(new InputStreamReader(ArffStreamTest.class.getResourceAsStream("abalone.arff")))
+        .fromArff(new InputStreamReader(ArffStreamTests.class.getResourceAsStream("abalone.arff")))
         .withClassMixture(0, 0.5, 0.5).fromStart()
         .withClassMixture(1.0, 0.0, 0.0).transition(new LinearTransition(20,33))
         .withClassMixture(0.0, 0.0, 1.0).transition(new AbruptTransition(50))

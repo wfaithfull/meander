@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 /**
  * @author Will Faithfull
  */
-public class ArffStreamTest {
+public class ArffStreamTests {
 
     @Test
     public void testArffStream() throws IOException {
