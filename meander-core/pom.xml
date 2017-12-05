@@ -39,6 +39,12 @@
             <artifactId>moa</artifactId>
             <version>2017.06</version>
         </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
     </dependencies>
 
 </project>

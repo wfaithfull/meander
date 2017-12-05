@@ -1,3 +1,6 @@
+import meka.core.A;
+import org.junit.Assert;
+import org.junit.Test;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.streams.Example;
 import uk.ac.bangor.meander.streams.StreamContext;
@@ -8,6 +11,8 @@ import uk.ac.bangor.meander.transitions.LogisticTransition;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -15,35 +20,108 @@ import java.util.stream.Stream;
  */
 public class ArffStreamTest {
 
-    public static void main(String[] args) throws IOException {
+    @Test
+    public void testArffStream() throws IOException {
         Stream<Example> arffStream = ChangeStreamBuilder
                 .fromArff("abalone.arff")
-                .withClassMixture(0, 0.5, 0.5).fromStart()
-                .withClassMixture(1.0, 0.0, 0.0).transition(new LinearTransition(20,33))
-                .withClassMixture(0.0, 0.0, 1.0).transition(new AbruptTransition(50))
-                .withUniformClassMixture().transition(new LogisticTransition(60,70))
+                .withUniformClassMixture().fromStart()
                 .build();
 
-        arffStream.limit(100).forEach(x -> {
-            StreamContext ctx = x.getContext();
-            System.out.println(String.format(
-                    "i=%-5d|S=%-2d|ω=%-2d| %-20s| %-35s| %-35s| %s",
-                    ctx.getIndex(),
-                    ctx.getSequence(),
-                    ctx.getLabel(),
-                    ctx.getCurrentTransition().isPresent() ? ctx.getCurrentTransition().get().getClass().getSimpleName() : "",
-                    doubleArrayToString(ctx.getSourcePriors(), "%.2f"),
-                    doubleArrayToString(ctx.getClassPriors(), "%.2f"),
-                    Arrays.toString(x.getData())));
-        });
+        int n = 100;
+        int counter = 0;
+
+        for(Example example : arffStream.limit(n).collect(Collectors.toList())) {
+            counter++;
+            Assert.assertTrue(example.getContext().getSequence() == 0);
+        }
+
+        Assert.assertEquals(n, counter);
     }
 
-    private static String doubleArrayToString(double[] array, String fmt) {
-        StringBuilder builder = new StringBuilder("[");
-        for(int i=0;i<array.length;i++) {
-            builder.append(String.format(fmt + (i < array.length-1 ? "," : ""), array[i]));
+    @Test
+    public void testAbruptTransition() throws IOException {
+        Stream<Example> arffStream = ChangeStreamBuilder
+                .fromArff("abalone.arff")
+                .withUniformClassMixture().fromStart()
+                .withClassMixture(1.0, 0.0, 0.0).transition(new AbruptTransition(50))
+                .build();
+
+        int n = 100;
+        int counter = 0;
+
+        Iterator<Example> iterator = arffStream.limit(n).iterator();
+        while (iterator.hasNext()){
+            Example example = iterator.next();
+
+            if(counter < 50) {
+                Assert.assertTrue(example.getContext().getSequence() == 0);
+            } else {
+                Assert.assertTrue(example.getContext().getSequence() == 1);
+                Assert.assertTrue(example.getContext().getLabel() == 0);
+            }
+            counter++;
         }
-        builder.append("]");
-        return builder.toString();
+
     }
+
+    @Test
+    public void testLinearTransition() throws IOException {
+
+        int L = 10;
+        int C = 50;
+        
+        Stream<Example> arffStream = ChangeStreamBuilder
+                .fromArff("abalone.arff")
+                .withUniformClassMixture().fromStart()
+                .withClassMixture(1.0, 0.0, 0.0).transition(new LinearTransition(C, C + L))
+                .build();
+
+        int n = 100;
+        int counter = 0;
+
+        Iterator<Example> iterator = arffStream.limit(n).iterator();
+        while (iterator.hasNext()){
+            Example example = iterator.next();
+
+            if(counter < C) {
+                Assert.assertTrue(example.getContext().getSequence() == 0);
+            } else if (counter > C+L) {
+                Assert.assertTrue(example.getContext().getSequence() == 1);
+                Assert.assertTrue(example.getContext().getLabel() == 0);
+            }
+            counter++;
+        }
+
+    }
+
+    @Test
+    public void testLogisticTransition() throws IOException {
+
+        int L = 10;
+        int C = 50;
+
+        Stream<Example> arffStream = ChangeStreamBuilder
+                .fromArff("abalone.arff")
+                .withUniformClassMixture().fromStart()
+                .withClassMixture(1.0, 0.0, 0.0).transition(new LogisticTransition(C, C + L))
+                .build();
+
+        int n = 100;
+        int counter = 0;
+
+        Iterator<Example> iterator = arffStream.limit(n).iterator();
+        while (iterator.hasNext()){
+            Example example = iterator.next();
+
+            if(counter < C) {
+                Assert.assertTrue(example.getContext().getSequence() == 0);
+            } else if (counter > C+L) {
+                Assert.assertTrue(example.getContext().getSequence() == 1);
+                Assert.assertTrue(example.getContext().getLabel() == 0);
+            }
+            counter++;
+        }
+
+    }
+
 }
