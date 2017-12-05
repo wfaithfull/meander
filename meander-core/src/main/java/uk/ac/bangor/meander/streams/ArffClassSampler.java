@@ -19,6 +19,11 @@ class ArffClassSampler extends AbstractClassSampler implements ClassSampler {
     private final List<List<Instance>> instancesByClass = new ArrayList<>();
     private final Random RNG = new Random(System.currentTimeMillis());
 
+    /**
+     * Sample the classes from a buffered .arff file.
+     * @param file BufferedReader pointing at the file
+     * @throws IOException if the file cannot be read.
+     */
     ArffClassSampler(BufferedReader file) throws IOException {
         Instances instances = new Instances(file);
         instances.setClassIndex(instances.numAttributes() - 1);
@@ -44,6 +49,9 @@ class ArffClassSampler extends AbstractClassSampler implements ClassSampler {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Double[] sample(int label) {
         List<Instance> choices = instancesByClass.get(label);
@@ -59,11 +67,17 @@ class ArffClassSampler extends AbstractClassSampler implements ClassSampler {
         return example;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getClasses() {
         return instancesByClass.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double[] getDistribution() {
         return classFrequencies;
