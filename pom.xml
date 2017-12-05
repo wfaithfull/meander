@@ -11,6 +11,7 @@
 
     <modules>
         <module>meander-core</module>
+        <module>meander-detectors</module>
     </modules>
 
     <build>

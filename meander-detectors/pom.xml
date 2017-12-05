@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>meander</artifactId>
+        <groupId>uk.ac.bangor</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>meander-detectors</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>nz.ac.waikato.cms.moa</groupId>
+            <artifactId>moa</artifactId>
+            <version>2017.06</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.ac.bangor</groupId>
+            <artifactId>meander-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.1</version>
+        </dependency>
+    </dependencies>
+
+</project>
