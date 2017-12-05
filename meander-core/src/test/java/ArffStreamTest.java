@@ -1,16 +1,12 @@
-import meka.core.A;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.streams.Example;
-import uk.ac.bangor.meander.streams.StreamContext;
 import uk.ac.bangor.meander.transitions.AbruptTransition;
 import uk.ac.bangor.meander.transitions.LinearTransition;
 import uk.ac.bangor.meander.transitions.LogisticTransition;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
