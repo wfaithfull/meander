@@ -1,5 +1,6 @@
 package uk.ac.bangor.meander.streams;
 
+import uk.ac.bangor.meander.MeanderException;
 import uk.ac.bangor.meander.transitions.Transition;
 
 import java.io.BufferedReader;
@@ -45,7 +46,7 @@ public class ChangeStreamBuilder {
         double probability = 1d / classSampler.getClasses();
 
         for(int i = 0; i < classSampler.getClasses(); i++) {
-            mixedSources.add(classSampler.toDataSource(i));
+            mixedSources.add(classSampler.toFactory(i));
             distribution[i] = probability;
         }
 
@@ -56,7 +57,7 @@ public class ChangeStreamBuilder {
     public SequenceBuilder withClassMixture(Function<Integer, double[]> distributionFunction) {
         List<ExampleProviderFactory> mixedSources = new ArrayList<>();
         for(int i = 0; i < classSampler.getClasses(); i++) {
-            mixedSources.add(classSampler.toDataSource(i));
+            mixedSources.add(classSampler.toFactory(i));
         }
         ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources, context -> distributionFunction.apply(mixedSources.size()));
         return new SequenceBuilder(exampleProviderFactory);
@@ -65,7 +66,7 @@ public class ChangeStreamBuilder {
     public SequenceBuilder withClassMixture(double... distribution) {
         List<ExampleProviderFactory> mixedSources = new ArrayList<>();
         for(int i = 0; i < classSampler.getClasses(); i++) {
-            mixedSources.add(classSampler.toDataSource(i));
+            mixedSources.add(classSampler.toFactory(i));
         }
         ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources, context -> distribution);
         return new SequenceBuilder(exampleProviderFactory);
@@ -80,7 +81,7 @@ public class ChangeStreamBuilder {
 
         public ChangeStreamBuilder fromStart() {
             if(!ChangeStreamBuilder.this.classExampleProviderFactories.isEmpty()) {
-                throw new IllegalStateException("There is already a starting data source configured.");
+                throw new MeanderException("There is already a starting data source configured.");
             }
             ChangeStreamBuilder.this.classExampleProviderFactories.add(exampleProviderFactory);
             return ChangeStreamBuilder.this;
@@ -88,7 +89,7 @@ public class ChangeStreamBuilder {
 
         public ChangeStreamBuilder transition(Transition transition) {
             if(ChangeStreamBuilder.this.classExampleProviderFactories.isEmpty()) {
-                throw new IllegalStateException("There must be a starting data source configured to transition between.");
+                throw new MeanderException("There must be a starting data source configured to transition between.");
             }
             ChangeStreamBuilder.this.classExampleProviderFactories.add(exampleProviderFactory);
             ChangeStreamBuilder.this.transitions.add(transition);

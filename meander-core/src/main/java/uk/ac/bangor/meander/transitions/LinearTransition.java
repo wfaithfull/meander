@@ -1,5 +1,7 @@
 package uk.ac.bangor.meander.transitions;
 
+import uk.ac.bangor.meander.MeanderException;
+
 import java.util.Arrays;
 
 /**
@@ -14,7 +16,7 @@ public class LinearTransition extends AbstractTransition {
         super(start, end);
 
         if(end - start <= 0)
-            throw new IllegalArgumentException("Transition must have a duration");
+            throw new MeanderException("Transition must have a duration");
     }
 
     @Override

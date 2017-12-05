@@ -1,5 +1,7 @@
 package uk.ac.bangor.meander.transitions;
 
+import uk.ac.bangor.meander.MeanderException;
+
 import java.util.Arrays;
 
 /**
@@ -18,6 +20,10 @@ public class LogisticTransition extends AbstractTransition {
 
     public LogisticTransition(long start, long end, int k) {
         super(start, end);
+
+        if(end - start <= 0)
+            throw new MeanderException("Transition must have a duration");
+
         this.k = k;
     }
 

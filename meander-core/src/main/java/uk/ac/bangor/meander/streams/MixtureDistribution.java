@@ -2,6 +2,7 @@ package uk.ac.bangor.meander.streams;
 
 import lombok.NonNull;
 import lombok.extern.java.Log;
+import uk.ac.bangor.meander.MeanderException;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,13 +40,13 @@ class MixtureDistribution implements ExampleProviderFactory {
         this.mixingFunction = mixingFunction;
         this.concept = concept;
         if(exampleProviderFactories.isEmpty()) {
-            throw new IllegalArgumentException("InstantMixtureDataSource requires at least one source!");
+            throw new MeanderException(getClass().getSimpleName() + " requires at least one source!");
         }
 
         double[] distribution = mixingFunction.getDistribution(StreamContext.START);
 
         if(distribution.length != exampleProviderFactories.size()) {
-            throw new IllegalArgumentException("Distribution must be over the data sources (must be same number of elements)");
+            throw new MeanderException("Distribution must be over the data sources (must be same number of elements)");
         }
 
         double sum = 0;
@@ -55,7 +56,7 @@ class MixtureDistribution implements ExampleProviderFactory {
 
         double difference = Math.abs(1 - sum);
         if(difference > EPS) {
-            throw new IllegalArgumentException("InstantMixtureDataSource probabilities must sum to 1 (" + sum + ")");
+            throw new MeanderException(getClass().getSimpleName() + " probabilities must sum to 1 (" + sum + ")");
         }
 
         if(exampleProviderFactories.size() == 1) {

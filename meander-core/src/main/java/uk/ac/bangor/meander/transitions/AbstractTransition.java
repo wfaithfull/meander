@@ -1,6 +1,7 @@
 package uk.ac.bangor.meander.transitions;
 
 import lombok.Getter;
+import uk.ac.bangor.meander.MeanderException;
 
 import java.util.Arrays;
 
@@ -24,7 +25,7 @@ public abstract class AbstractTransition implements Transition {
     public double[] getMixture(long index) {
 
         if(!isValidFor(index))
-            throw new IllegalStateException("Transition was applied to an illegal index");
+            throw new MeanderException("Transition was applied to an illegal index");
 
         return mixture(index);
     }
@@ -37,7 +38,7 @@ public abstract class AbstractTransition implements Transition {
     @Override
     public void prepare(double[] p1, double[] p2) {
         if(p1.length != p2.length)
-            throw new IllegalArgumentException("Distributions must be of equal size");
+            throw new MeanderException("Distributions must be of equal size");
 
         this.p1 = Arrays.copyOf(p1, p1.length);
         this.p2 = Arrays.copyOf(p2, p2.length);
