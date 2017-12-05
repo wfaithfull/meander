@@ -4,6 +4,7 @@ import uk.ac.bangor.meander.transitions.Transition;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,11 @@ public class ChangeStreamBuilder {
     public static ChangeStreamBuilder fromArff(Reader reader) throws IOException {
         return new ChangeStreamBuilder(new ArffClassSampler(new BufferedReader(reader)));
     }
+
+    public static ChangeStreamBuilder fromArff(String file) throws IOException {
+        return fromArff(new InputStreamReader(ChangeStreamBuilder.class.getClassLoader().getResourceAsStream(file)));
+    }
+
 
     public SequenceBuilder withUniformClassMixture() {
         List<DataSource> mixedSources = new ArrayList<>();
