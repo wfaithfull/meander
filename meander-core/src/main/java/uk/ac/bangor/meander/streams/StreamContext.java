@@ -37,6 +37,10 @@ public class StreamContext {
         }
     }
 
+    public boolean isChanging() {
+        return getCurrentTransition().isPresent();
+    }
+
     public double[] getClassPriors() {
         double[] jointClassPriors = new double[classPriors.get(0).length];
 
