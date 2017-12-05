@@ -36,14 +36,15 @@ class MixtureDistribution implements ExampleProviderFactory {
      */
     private MixtureDistribution(@NonNull final List<ExampleProviderFactory> exampleProviderFactories,
                                 @NonNull final MixingFunction mixingFunction,
-                                @NonNull final StreamConcept concept) {
+                                @NonNull final StreamConcept concept,
+                                @NonNull final StreamContext context) {
         this.mixingFunction = mixingFunction;
         this.concept = concept;
         if(exampleProviderFactories.isEmpty()) {
             throw new MeanderException(getClass().getSimpleName() + " requires at least one source!");
         }
 
-        double[] distribution = mixingFunction.getDistribution(StreamContext.START);
+        double[] distribution = mixingFunction.getDistribution(context);
 
         if(distribution.length != exampleProviderFactories.size()) {
             throw new MeanderException("Distribution must be over the data sources (must be same number of elements)");
@@ -84,7 +85,7 @@ class MixtureDistribution implements ExampleProviderFactory {
             cumulative += probability;
             if(choice <= cumulative) {
                 label = i;
-                source = exampleProviderFactories.get(label).getSource();
+                source = exampleProviderFactories.get(label).getProvider();
                 break;
             }
         }
@@ -109,17 +110,19 @@ class MixtureDistribution implements ExampleProviderFactory {
      * {@inheritDoc}
      */
     @Override
-    public ExampleProvider getSource() {
+    public ExampleProvider getProvider() {
         return context -> new Example(sample(context), context);
     }
 
     static ExampleProviderFactory ofClasses(@NonNull final List<ExampleProviderFactory> exampleProviderFactories,
-                                            @NonNull final MixingFunction mixingFunction) {
-        return new MixtureDistribution(exampleProviderFactories, mixingFunction, StreamConcept.CLASS);
+                                            @NonNull final MixingFunction mixingFunction,
+                                            @NonNull final StreamContext context) {
+        return new MixtureDistribution(exampleProviderFactories, mixingFunction, StreamConcept.CLASS, context);
     }
 
     static ExampleProviderFactory ofSources(@NonNull final List<ExampleProviderFactory> exampleProviderFactories,
-                                            @NonNull final MixingFunction mixingFunction) {
-        return new MixtureDistribution(exampleProviderFactories, mixingFunction, StreamConcept.SOURCE);
+                                            @NonNull final MixingFunction mixingFunction,
+                                            @NonNull final StreamContext context) {
+        return new MixtureDistribution(exampleProviderFactories, mixingFunction, StreamConcept.SOURCE, context);
     }
 }

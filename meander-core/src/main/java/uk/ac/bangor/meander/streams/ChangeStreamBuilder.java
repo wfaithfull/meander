@@ -24,11 +24,13 @@ public class ChangeStreamBuilder {
     private List<ExampleProviderFactory> classExampleProviderFactories;
     private List<Transition>             transitions;
     private ExampleProviderFactory       sequenceExampleProviderFactory;
+    private StreamContext                context;
 
     private ChangeStreamBuilder(ClassSampler classSampler) {
         this.classSampler = classSampler;
         this.classExampleProviderFactories = new ArrayList<>();
         this.transitions = new ArrayList<>();
+        this.context = new StreamContext();
     }
 
     public static ChangeStreamBuilder fromArff(Reader reader) throws IOException {
@@ -50,7 +52,8 @@ public class ChangeStreamBuilder {
             distribution[i] = probability;
         }
 
-        ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources, context -> distribution);
+        ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources,
+                context -> distribution, context);
         return new SequenceBuilder(exampleProviderFactory);
     }
 
@@ -59,7 +62,8 @@ public class ChangeStreamBuilder {
         for(int i = 0; i < classSampler.getClasses(); i++) {
             mixedSources.add(classSampler.toFactory(i));
         }
-        ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources, context -> distributionFunction.apply(mixedSources.size()));
+        ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources,
+                context -> distributionFunction.apply(mixedSources.size()), context);
         return new SequenceBuilder(exampleProviderFactory);
     }
 
@@ -68,7 +72,8 @@ public class ChangeStreamBuilder {
         for(int i = 0; i < classSampler.getClasses(); i++) {
             mixedSources.add(classSampler.toFactory(i));
         }
-        ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources, context -> distribution);
+        ExampleProviderFactory exampleProviderFactory = MixtureDistribution.ofClasses(mixedSources,
+                context -> distribution, context);
         return new SequenceBuilder(exampleProviderFactory);
     }
 
@@ -98,8 +103,9 @@ public class ChangeStreamBuilder {
     }
 
     public Stream<Example> build() {
-        sequenceExampleProviderFactory = MixtureDistribution.ofSources(this.classExampleProviderFactories, new SequentialMixingFunction(transitions));
-        return StreamSupport.stream(new ExampleSpliterator(sequenceExampleProviderFactory), false);
+        sequenceExampleProviderFactory = MixtureDistribution.ofSources(this.classExampleProviderFactories,
+                new SequentialMixingFunction(transitions), context);
+        return StreamSupport.stream(new ExampleSpliterator(sequenceExampleProviderFactory, context), false);
     }
 
 }

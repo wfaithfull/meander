@@ -13,14 +13,14 @@ class ExampleSpliterator implements Spliterator<Example> {
     private ExampleProviderFactory source;
     private StreamContext          context;
 
-    ExampleSpliterator(@NonNull final ExampleProviderFactory source) {
+    ExampleSpliterator(@NonNull final ExampleProviderFactory source, @NonNull final StreamContext context) {
         this.source = source;
-        this.context = StreamContext.START;
+        this.context = context;
     }
 
     @Override
     public boolean tryAdvance(Consumer<? super Example> action) {
-        action.accept(source.getSource().apply(context));
+        action.accept(source.getProvider().apply(context));
         context.advance();
         return true;
     }

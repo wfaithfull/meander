@@ -57,7 +57,7 @@ class SequentialMixingFunction implements MixingFunction {
                     pointer.prepare(p1, p2);
                 }
 
-                return pointer.getMixture(index);
+                return pointer.getDistribution(context);
             }
         }
 

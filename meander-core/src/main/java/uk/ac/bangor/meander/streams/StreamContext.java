@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * @author Will Faithfull
  * Context class which holds information about the current place in the stream, as well as the labels
- * for the underlying sequence and class of the last example.
+ * for the source and class of the last example.
  */
 public class StreamContext {
 
@@ -22,23 +22,12 @@ public class StreamContext {
     @Getter @Setter(AccessLevel.PACKAGE)         private double[]         sourcePriors;
     private                                              List<double[]>  classPriors;
 
-    private StreamContext() {
+    StreamContext() {
         index = 0;
         this.transitions = new ArrayList<>();
         this.classPriors = new LinkedList<>();
     }
 
-    void advance() {
-        index++;
-        classPriors = new LinkedList<>();
-    }
-
-    static StreamContext START = new StreamContext();
-
-    void transition(Transition transition) {
-        transitions.add(transition);
-        mostRecent = transition;
-    }
 
     public Optional<Transition> getCurrentTransition() {
         if(mostRecent.isValidFor(index)) {
@@ -66,6 +55,16 @@ public class StreamContext {
         }
 
         return jointClassPriors;
+    }
+
+    void advance() {
+        index++;
+        classPriors = new LinkedList<>();
+    }
+
+    void transition(Transition transition) {
+        transitions.add(transition);
+        mostRecent = transition;
     }
 
     void setClassPriors(double[] classPriors) {
