@@ -25,6 +25,15 @@ import java.util.stream.Stream;
 public class BasicEvaluator implements Evaluator {
 
     private static final long MAX_N = 3000000000L;
+    private final int warmup;
+
+    public BasicEvaluator(int warmup) {
+        this.warmup = warmup;
+    }
+
+    public BasicEvaluator() {
+        this(0);
+    }
 
     @Override
     public Evaluation evaluate(Detector<Double[]> detector, Stream<Example> changeStream) {
@@ -45,6 +54,14 @@ public class BasicEvaluator implements Evaluator {
         double idealARL = 0;
 
         Transition transition = null;
+
+        if(warmup > 0) {
+            log.info(String.format("Warming up with %d examples...", warmup));
+        }
+        for(int i=warmup;i>0;i--) {
+            Example example = iterator.next();
+            detector.update(example.getData());
+        }
 
         while(iterator.hasNext() && n < MAX_N) {
             Example example = iterator.next();
