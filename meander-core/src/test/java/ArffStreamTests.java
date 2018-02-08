@@ -1,5 +1,6 @@
 import org.junit.Assert;
 import org.junit.Test;
+import uk.ac.bangor.meander.streams.ArffSpliterator;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.streams.Example;
 import uk.ac.bangor.meander.transitions.AbruptTransition;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * @author Will Faithfull
@@ -59,6 +61,18 @@ public class ArffStreamTests {
         }
 
         Assert.assertEquals(n, counter);
+    }
+
+    @Test
+    public void testSimpleArffStream() throws IOException {
+        Stream<Example> arffStream = StreamSupport.stream(new ArffSpliterator(getClass().getClassLoader(), "abalone.arff"), false);
+
+        Iterator<Example> iterator = arffStream.iterator();
+        while (iterator.hasNext()){
+            Example example = iterator.next();
+            System.out.println(example.getContext().getLabel());
+        }
+
     }
 
     @Test

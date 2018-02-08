@@ -31,9 +31,12 @@ class ExampleSpliterator implements Spliterator<Example> {
      */
     @Override
     public boolean tryAdvance(Consumer<? super Example> action) {
+        if(context.isFinished())
+            return false;
+
         action.accept(source.getProvider().apply(context));
         context.advance();
-        return true;
+        return !context.isFinished();
     }
 
     /**
