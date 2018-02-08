@@ -19,19 +19,12 @@ public class StreamContext {
     @Getter @Setter                                      int              label;
     @Getter @Setter                                      List<Transition> transitions;
     private                                              Transition       mostRecent;
-    @Getter @Setter(AccessLevel.PACKAGE)         private double[]         sourcePriors;
+    @Getter @Setter(AccessLevel.PACKAGE) private         double[]         sourcePriors;
     private                                              List<double[]>  classPriors;
-    @Getter @Setter(AccessLevel.PACKAGE)
-    private boolean finished;
-    private ChangeType changeType;
+    @Getter @Setter(AccessLevel.PACKAGE) private         boolean finished;
 
     StreamContext() {
-        this(ChangeType.ARTIFICIAL);
-    }
-
-    StreamContext(ChangeType changeType) {
         index = 0;
-        this.changeType = changeType;
         this.transitions = new ArrayList<>();
         this.classPriors = new LinkedList<>();
     }
