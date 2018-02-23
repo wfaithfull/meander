@@ -30,7 +30,7 @@ public class StreamContext {
     }
 
     public Optional<Transition> getCurrentTransition() {
-        if(mostRecent.isValidFor(index)) {
+        if(mostRecent != null && mostRecent.isValidFor(index)) {
             return Optional.of(mostRecent);
         } else {
             return Optional.empty();
