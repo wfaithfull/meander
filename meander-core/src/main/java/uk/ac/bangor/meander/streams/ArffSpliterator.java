@@ -11,12 +11,20 @@ import java.io.InputStreamReader;
  */
 public class ArffSpliterator extends ExampleSpliterator {
 
-    ArffSpliterator(BufferedReader file) throws IOException {
+    public ArffSpliterator(BufferedReader file) throws IOException {
         super(new ArffExampleProviderFactory(new Instances(file)), new StreamContext());
+    }
+
+    public ArffSpliterator(BufferedReader file, Integer... changeClasses) throws IOException {
+        super(new ArffExampleProviderFactory(new Instances(file), changeClasses), new StreamContext());
     }
 
     public ArffSpliterator(ClassLoader classLoader, String file) throws IOException {
         this(new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(file))));
+    }
+
+    public ArffSpliterator(ClassLoader classLoader, String file, Integer... changeClasses) throws IOException {
+        this(new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(file))), changeClasses);
     }
 
 }
