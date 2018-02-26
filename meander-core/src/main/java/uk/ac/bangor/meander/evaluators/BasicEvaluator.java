@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  *      Missed Detection Ratio  (MDR)
  */
 @Log
-public class BasicEvaluator implements Evaluator {
+public class BasicEvaluator extends AbstractEvaluator {
 
     private static final long MAX_N = 3000000000L;
     private final int warmup;
@@ -103,15 +103,4 @@ public class BasicEvaluator implements Evaluator {
         return new Evaluation(n, transitions, detections, ttds, runLengths, falseAlarms, idealARL);
     }
 
-    @Override
-    public Evaluation evaluate(Detector<Double[]> detector, ChangeStreamBuilder changeStream, long limit, long n) {
-
-        ArrayList<Evaluation> evaluations= new ArrayList<>();
-
-        for(int i=0; i<n; i++) {
-            evaluations.add(evaluate(detector, changeStream.build().limit(limit)));
-        }
-
-        return new Evaluation(evaluations);
-    }
 }
