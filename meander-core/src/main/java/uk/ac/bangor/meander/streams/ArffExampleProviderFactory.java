@@ -14,17 +14,27 @@ import java.util.Set;
  */
 public class ArffExampleProviderFactory implements ExampleProviderFactory {
 
+    private final Integer classIndex;
     private Iterator<Instance> instances;
     private Set<Integer>       changeLabels = new HashSet<>();
     private Integer            lastClass;
 
     public ArffExampleProviderFactory(Instances instances) {
-        instances.setClassIndex(instances.numAttributes()-1);
+        this(instances, instances.numAttributes()-1);
+    }
+
+    public ArffExampleProviderFactory(Instances instances, Integer classIndex) {
+        instances.setClassIndex(classIndex);
+        this.classIndex = classIndex;
         this.instances = instances.iterator();
     }
 
     public ArffExampleProviderFactory(Instances instances, Integer... changeLabels) {
-        this(instances);
+        this(instances, instances.numAttributes()-1, changeLabels);
+    }
+
+    public ArffExampleProviderFactory(Instances instances, Integer classIndex, Integer... changeLabels) {
+        this(instances, classIndex);
         this.changeLabels.addAll(Arrays.asList(changeLabels));
     }
 
@@ -39,8 +49,11 @@ public class ArffExampleProviderFactory implements ExampleProviderFactory {
 
     private Example instanceToExample(Instance instance, StreamContext context) {
         double[] data = instance.toDoubleArray();
-        Double[] boxed = new Double[data.length];
+        Double[] boxed = new Double[data.length-1];
         for(int i=0;i<data.length;i++) {
+            if(classIndex.equals(i)) {
+                continue;
+            }
             boxed[i] = data[i];
         }
 
