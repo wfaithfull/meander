@@ -5,7 +5,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.commons.math3.stat.correlation.Covariance;
-import uk.ac.bangor.meander.detectors.windowing.FixedWindowPair;
+import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 
 /**
  * @author Will Faithfull
@@ -13,11 +13,11 @@ import uk.ac.bangor.meander.detectors.windowing.FixedWindowPair;
 public class Hotelling implements Detector<Double[]> {
 
     private static final int MAX_CONDITION = 10000;
-    private FixedWindowPair<double[]> windowPair;
-    private FDistribution             fDistribution;
-    private boolean                   change;
+    private WindowPair<double[]> windowPair;
+    private FDistribution        fDistribution;
+    private boolean              change;
 
-    public Hotelling(FixedWindowPair<double[]> windowPair) {
+    public Hotelling(WindowPair<double[]> windowPair) {
         this.windowPair = windowPair;
     }
 

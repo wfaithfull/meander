@@ -10,16 +10,19 @@ import java.lang.reflect.Array;
  * Represents a pair of sliding windows, with W1 holding the oldest observations, and W2 holding the newest.
  */
 @Getter
-public class FixedWindowPair<T> implements Window<T> {
+public class WindowPair<T> implements Window<T> {
 
-    private Window<T> window1;
-    private Window<T> window2;
-    private Class<T> tClass;
+    protected Window<T> window1;
+    protected Window<T> window2;
 
-    public FixedWindowPair(int size1, int size2, Class<T> tClass) {
-        this.tClass = tClass;
-        window1 = new FixedWindow<>(size1, tClass);
-        window2 = new FixedWindow<>(size2, tClass);
+    public WindowPair(int w1sz, int w2sz, Class<T> tClass) {
+        this.window1 = new FixedWindow<T>(w1sz, tClass);
+        this.window2 = new FixedWindow<T>(w2sz, tClass);
+    }
+
+    public WindowPair(Window<T> window1, Window<T> window2) {
+        this.window1 = window1;
+        this.window2 = window2;
     }
 
     @Override

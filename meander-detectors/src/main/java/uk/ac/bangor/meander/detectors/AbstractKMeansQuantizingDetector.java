@@ -16,7 +16,7 @@ import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import org.apache.commons.math3.random.RandomGeneratorFactory;
 import org.apache.commons.math3.stat.correlation.Covariance;
-import uk.ac.bangor.meander.detectors.windowing.FixedWindowPair;
+import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractKMeansQuantizingDetector {
 
-    protected final FixedWindowPair<double[]>            windowPair;
+    protected final WindowPair<double[]>                 windowPair;
     private final   KMeansPlusPlusClusterer<DoublePoint> clusterer;
     protected final int                                  K;
 
@@ -63,11 +63,11 @@ public abstract class AbstractKMeansQuantizingDetector {
     protected double[] p1;
     protected double[] p2;
 
-    public AbstractKMeansQuantizingDetector(FixedWindowPair<double[]> windowPair) {
+    public AbstractKMeansQuantizingDetector(WindowPair<double[]> windowPair) {
         this(windowPair, 3);
     }
 
-    public AbstractKMeansQuantizingDetector(FixedWindowPair<double[]> windowPair, int K) {
+    public AbstractKMeansQuantizingDetector(WindowPair<double[]> windowPair, int K) {
         this.windowPair = windowPair;
         this.K = K;
         clusterer = new KMeansPlusPlusClusterer<>(K, 100, new EuclideanDistance(), RandomGeneratorFactory.createRandomGenerator(new Random()), KMeansPlusPlusClusterer.EmptyClusterStrategy.FARTHEST_POINT);

@@ -38,4 +38,9 @@ public class FunctionalDetector implements Detector<Double[]> {
     public boolean isChangeDetected() {
         return change;
     }
+
+    @Override
+    public void reset() {
+
+    }
 }

@@ -2,7 +2,7 @@ package uk.ac.bangor.meander.detectors;
 
 import lombok.extern.java.Log;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
-import uk.ac.bangor.meander.detectors.windowing.FixedWindowPair;
+import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 
 /**
  * @author Will Faithfull
@@ -12,7 +12,7 @@ public class SPLL extends AbstractKMeansQuantizingDetector implements ReductionF
 
     ChiSquaredDistribution cdf;
 
-    public SPLL(FixedWindowPair<double[]> windowPair, int K) {
+    public SPLL(WindowPair<double[]> windowPair, int K) {
         super(windowPair, K);
     }
 

@@ -10,7 +10,7 @@ import java.util.List;
  *
  * Adapts the univariate change detectors from MOA into the meander format.
  */
-public class MoaDetectorAdapter implements Detector<Double> {
+public class MoaDetectorAdapter extends AbstractUnivariateDetector {
 
     private ChangeDetector moaDetector;
     public MoaDetectorAdapter(ChangeDetector moaDetector) {
