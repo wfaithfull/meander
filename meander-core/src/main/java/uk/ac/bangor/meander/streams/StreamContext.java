@@ -22,11 +22,19 @@ public class StreamContext {
     @Getter @Setter(AccessLevel.PACKAGE) private         double[]         sourcePriors;
     private                                              List<double[]>  classPriors;
     @Getter @Setter(AccessLevel.PACKAGE) private         boolean finished;
+    @Getter @Setter private                              Integer[] changeLabels;
 
     StreamContext() {
         index = 0;
         this.transitions = new ArrayList<>();
         this.classPriors = new LinkedList<>();
+    }
+
+    StreamContext(Integer[] changeLabels) {
+        index = 0;
+        this.transitions = new ArrayList<>();
+        this.classPriors = new LinkedList<>();
+        setChangeLabels(changeLabels);
     }
 
     public Optional<Transition> getCurrentTransition() {

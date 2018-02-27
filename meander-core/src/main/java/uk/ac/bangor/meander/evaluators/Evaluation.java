@@ -1,6 +1,8 @@
 package uk.ac.bangor.meander.evaluators;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import uk.ac.bangor.meander.MeanderException;
 import uk.ac.bangor.meander.transitions.Transition;
 
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.List;
 @Data
 public class Evaluation {
 
+    private int earlyDetection;
     private long n;
     private long missed;
     private List<Long> detections;
@@ -28,9 +31,12 @@ public class Evaluation {
     double far;
     double mdr;
 
-    public Evaluation(long n, List<Transition> transitions, List<Long> detections, List<Long> ttds,
-                      List<Long> rls, List<Long> falseAlarms, double idealARL) {
-        prepare(n, transitions, detections, ttds, rls, falseAlarms, idealARL);
+    public Evaluation(long n, List<Transition> transitions, List<Long> detections) {
+        prepare(n, transitions, detections, 0);
+    }
+
+    public Evaluation(long n, List<Transition> transitions, List<Long> detections, int earlyDetection) {
+        prepare(n, transitions, detections, earlyDetection);
     }
 
     public Evaluation(List<Evaluation> evaluations) {
@@ -43,7 +49,12 @@ public class Evaluation {
         double idealARL = 0;
         List<Transition> transitions = new ArrayList<>();
 
+        int earlyDetection = evaluations.get(0).getEarlyDetection();
+
         for(Evaluation evaluation : evaluations) {
+            if(earlyDetection != evaluation.getEarlyDetection()) {
+                throw new MeanderException("Inconsistent values for early detection in evaluations list. Cannot proceed.");
+            }
             n += evaluation.getN();
             missed += evaluation.getMissed();
             detections.addAll(evaluation.getDetections());
@@ -51,21 +62,100 @@ public class Evaluation {
             rls.addAll(evaluation.getRls());
             falseAlarms.addAll(evaluation.getFalseAlarms());
             idealARL += evaluation.idealARL;
-            transitions.addAll(evaluation.getTransitions());
+            this.transitions.addAll(evaluation.getTransitions());
         }
 
-        prepare(n, transitions, detections, ttds, rls, falseAlarms, idealARL/evaluations.size());
+        prepare(n, transitions, detections, earlyDetection);
     }
     
-    private void prepare(long n, List<Transition> transitions, List<Long> detections, List<Long> ttds,
-                         List<Long> rls, List<Long> falseAlarms, double idealARL) {
+    private void prepare(long n, List<Transition> transitions, List<Long> detections, int earlyDetection) {
         this.n = n;
         this.transitions = transitions;
         this.detections = detections;
-        this.ttds = ttds;
-        this.rls = rls;
-        this.falseAlarms = falseAlarms;
-        this.idealARL = idealARL;
+        this.ttds = new ArrayList<>();
+        this.rls = new ArrayList<>();
+        this.falseAlarms = new ArrayList<>();
+        this.earlyDetection = earlyDetection;
+
+        computeDetections();
+        computeRunLengths();
+
+        if(!this.ttds.isEmpty()) {
+            long total = 0;
+            for(Long ttd : this.ttds) {
+                total += ttd;
+            }
+            this.ttd = total / (double)this.ttds.size();
+        } else {
+            this.ttd = n;
+        }
+
+        this.mdr = missed / n;
+        this.far = falseAlarms.size() / (double)n;
+    }
+
+    private void computeDetections() {
+        if(this.transitions.size() == 0) {
+            // No transitions means nothing to miss.
+            missed = 0;
+        } else if (detections.size() == 0) {
+            // No detections means all transitions were missed.
+            missed = this.transitions.size();
+        } else {
+            // Iterate transitions and find matching detections.
+            for(int tIdx = 0; tIdx < this.transitions.size(); tIdx++) {
+
+                Transition a = this.transitions.get(tIdx);
+                Transition b = null;
+                if(tIdx < this.transitions.size() - 1) {
+                    b = this.transitions.get(tIdx + 1);
+                }
+
+                // Was transition A detected?
+                boolean detected = false;
+
+                for(int dIdx = 0; dIdx < detections.size(); dIdx++) {
+                    long detection = detections.get(dIdx);
+
+                    long bStart = b != null ? b.getStart() - earlyDetection : Long.MAX_VALUE;
+
+                    if(detection > bStart) {
+
+                        if(!detected) {
+                            missed++;
+                        }
+
+                        break;
+                    }
+
+                    if(detection >= a.getStart() - earlyDetection && detection < bStart) {
+                        if(detected) {
+                            this.falseAlarms.add(detection);
+                        } else {
+                            detected = true;
+                            this.ttds.add(detection - a.getStart());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void computeRunLengths() {
+
+        long start = 0;
+        for(Transition tn : transitions) {
+            this.idealARL += tn.getStart() - start;
+            start = tn.getStart();
+        }
+        this.idealARL = idealARL / (double)transitions.size();
+
+        long last = 0;
+        for(long detection : detections) {
+            long rl = detection - last;
+            last = detection;
+            this.rls.add(rl);
+        }
 
         if(!rls.isEmpty()) {
             long total = 0;
@@ -76,23 +166,6 @@ public class Evaluation {
         } else {
             this.arl = n;
         }
-
-        if(!ttds.isEmpty()) {
-            long total = 0;
-            for(Long ttd : ttds) {
-                total += ttd;
-            }
-            this.ttd = total / (double)ttds.size();
-        } else {
-            this.ttd = n;
-        }
-
-        if(!transitions.isEmpty()) {
-            missed = transitions.size() - ttds.size();
-        }
-
-        this.mdr = missed / n;
-        this.far = falseAlarms.size() / (double)n;
     }
 
     @Override

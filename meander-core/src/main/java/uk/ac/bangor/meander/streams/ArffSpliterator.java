@@ -16,7 +16,7 @@ public class ArffSpliterator extends ExampleSpliterator {
     }
 
     public ArffSpliterator(BufferedReader file, Integer... changeClasses) throws IOException {
-        super(new ArffExampleProviderFactory(new Instances(file), changeClasses), new StreamContext());
+        super(new ArffExampleProviderFactory(new Instances(file), changeClasses), new StreamContext(changeClasses));
     }
 
     public ArffSpliterator(ClassLoader classLoader, String file) throws IOException {

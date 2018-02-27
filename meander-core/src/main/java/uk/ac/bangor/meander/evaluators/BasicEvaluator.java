@@ -42,16 +42,8 @@ public class BasicEvaluator extends AbstractEvaluator {
 
         long n = 0;
 
-        long rl = 0;
-        long irl = 0;
-
         ArrayList<Long> detections  = new ArrayList<>();
-        ArrayList<Long> ttds        = new ArrayList<>();
-        ArrayList<Long> runLengths  = new ArrayList<>();
-        ArrayList<Long> falseAlarms = new ArrayList<>();
         LinkedList<Transition> transitions = new LinkedList<>();
-
-        double idealARL = 0;
 
         Transition transition = null;
 
@@ -73,34 +65,22 @@ public class BasicEvaluator extends AbstractEvaluator {
             if(ctx.isChanging()) {
                 transition = ctx.getCurrentTransition().get();
                 if(transition != transitions.peekLast()) {
-                    idealARL += irl;
                     transitions.add(transition);
                 }
             }
 
             if(detector.isChangeDetected()) {
-                runLengths.add(rl);
-                rl = 0;
                 detections.add(index);
-
-                if(transition != null) {
-                    ttds.add(index - transition.getStart());
-                    transition = null;
-                } else {
-                    falseAlarms.add(index);
-                }
             }
 
             if(n > 100000) {
                 log.warning("Did you forget to limit the stream? I will technically keep going until n=" + MAX_N);
             }
 
-            n++; rl++; irl++;
+            n++;
         }
 
-        idealARL = idealARL / transitions.size();
-
-        return new Evaluation(n, transitions, detections, ttds, runLengths, falseAlarms, idealARL);
+        return new Evaluation(n, transitions, detections);
     }
 
 }
