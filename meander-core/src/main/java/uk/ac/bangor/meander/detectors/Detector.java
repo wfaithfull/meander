@@ -9,4 +9,5 @@ public interface Detector<T> {
 
     boolean isChangeDetected();
 
+    void reset();
 }
