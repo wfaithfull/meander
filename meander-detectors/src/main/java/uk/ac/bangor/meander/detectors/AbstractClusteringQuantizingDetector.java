@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * @author Will Faithfull
  */
-public abstract class AbstractClusteringQuantizingDetector implements Detector<double[]> {
+public abstract class AbstractClusteringQuantizingDetector extends AbstractUnboxingDetector {
 
     private WindowPair<double[]> windowPair;
     protected ClusteringWindow w1, w2;
@@ -24,7 +24,6 @@ public abstract class AbstractClusteringQuantizingDetector implements Detector<d
         windowPair = new WindowPair<>(w1, w2);
     }
 
-    @Override
     public void update(double[] input) {
         windowPair.update(input);
 
