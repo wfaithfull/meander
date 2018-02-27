@@ -10,7 +10,7 @@ import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 /**
  * @author Will Faithfull
  */
-public class Hotelling implements Detector<Double[]> {
+public class Hotelling extends AbstractMultivariateDetector {
 
     private static final int MAX_CONDITION = 10000;
     private WindowPair<double[]> windowPair;
