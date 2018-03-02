@@ -10,12 +10,14 @@ import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 /**
  * @author Will Faithfull
  */
-public class Hotelling extends AbstractMultivariateDetector {
+public class Hotelling extends AbstractMultivariateDetector implements ReductionFunction, DecisionFunction {
 
     private static final int MAX_CONDITION = 10000;
     private WindowPair<double[]> windowPair;
     private FDistribution        fDistribution;
     private boolean              change;
+
+    private int df1,df2;
 
     public Hotelling(WindowPair<double[]> windowPair) {
         this.windowPair = windowPair;
@@ -23,19 +25,53 @@ public class Hotelling extends AbstractMultivariateDetector {
 
     @Override
     public void update(Double[] input) {
+        double tsq = reduce(input);
+        this.change = decide(tsq);
+    }
+
+    @Override
+    public boolean isChangeDetected() {
+        return change;
+    }
+
+    private double[] getDiagonal(RealMatrix matrix) {
+        if(!matrix.isSquare())
+            throw new RuntimeException("Matrix must be square to retrieve diagonal.");
+        double[][] data = matrix.getData();
+        double[] diagonal = new double[data.length];
+        int col = 0;
+        for(int i=0;i<data.length;i++) {
+            diagonal[col] = data[i][col++];
+        }
+        return diagonal;
+    }
+
+    @Override
+    public boolean decide(Double tsq) {
+
+        if(df1 < 0 || df2 < 0) {
+            return false;
+        }
+
+        fDistribution = new FDistribution(df1, df2);
+
+        double pst = 1-fDistribution.cumulativeProbability(tsq);
+
+        return pst < 0.05;
+    }
+
+    @Override
+    public double reduce(Double[] input) {
+
         double[] unboxed = new double[input.length];
         for(int i=0;i<input.length;i++) {
             unboxed[i] = input[i];
         }
-        update(unboxed);
-    }
-    
-    public void update(double[] input) {
 
-        windowPair.update(input);
+        windowPair.update(unboxed);
 
         if(windowPair.size() != windowPair.capacity())
-            return;
+            return Double.NaN;
 
         double[][] w1 = windowPair.getWindow1().getElements();
         double[][] w2 = windowPair.getWindow2().getElements();
@@ -71,31 +107,9 @@ public class Hotelling extends AbstractMultivariateDetector {
 
         tsq = tsq * dist;
 
-        int df1 = (int)n;
-        int df2 = (int)(m1 + m2 - n - 1);
+        df1 = (int)n;
+        df2 = (int)(m1 + m2 - n - 1);
 
-        if(fDistribution == null)
-            fDistribution = new FDistribution(df1, df2);
-
-        double pst = 1-fDistribution.cumulativeProbability(tsq);
-
-        this.change = pst < 0.05;
-    }
-
-    @Override
-    public boolean isChangeDetected() {
-        return change;
-    }
-
-    private double[] getDiagonal(RealMatrix matrix) {
-        if(!matrix.isSquare())
-            throw new RuntimeException("Matrix must be square to retrieve diagonal.");
-        double[][] data = matrix.getData();
-        double[] diagonal = new double[data.length];
-        int col = 0;
-        for(int i=0;i<data.length;i++) {
-            diagonal[col] = data[i][col++];
-        }
-        return diagonal;
+        return tsq;
     }
 }
