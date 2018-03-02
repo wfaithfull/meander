@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public abstract class AbstractEvaluator implements Evaluator {
 
     @Getter @Setter int allowEarly = 0;
+    @Setter protected ProgressReporter progressReporter;
 
     @Override
     public Evaluation evaluate(Detector<Double[]> detector, ChangeStreamBuilder changeStream, long limit, long n) {

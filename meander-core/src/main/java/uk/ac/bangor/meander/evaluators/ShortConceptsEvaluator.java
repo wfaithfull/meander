@@ -1,5 +1,6 @@
 package uk.ac.bangor.meander.evaluators;
 
+import lombok.Setter;
 import lombok.extern.java.Log;
 import uk.ac.bangor.meander.detectors.Detector;
 import uk.ac.bangor.meander.streams.Example;
@@ -31,16 +32,6 @@ import java.util.stream.Stream;
 public class ShortConceptsEvaluator extends AbstractEvaluator {
 
     private static final long MAX_N = 3000000000L;
-    private final int warmup;
-
-    public ShortConceptsEvaluator(int warmup) {
-        this.warmup = warmup;
-    }
-
-    public ShortConceptsEvaluator() {
-        this(0);
-    }
-
     @Override
     public Evaluation evaluate(Detector<Double[]> detector, Stream<Example> changeStream) {
 
@@ -53,18 +44,15 @@ public class ShortConceptsEvaluator extends AbstractEvaluator {
 
         Transition transition = null;
 
-        if(warmup > 0) {
-            log.info(String.format("Warming up with %d examples...", warmup));
-        }
-        for(int i=warmup;i>0;i--) {
-            Example example = iterator.next();
-            detector.update(example.getData());
-        }
-
         int currentClass = 0;
         Set<Integer> changeClasses = new HashSet<>();
 
         while(iterator.hasNext() && n < MAX_N) {
+
+            if(progressReporter != null) {
+                progressReporter.update(n);
+            }
+
             Example example = iterator.next();
             StreamContext ctx = example.getContext();
 
