@@ -1,5 +1,6 @@
 import lombok.extern.java.Log;
 import uk.ac.bangor.meander.detectors.*;
+import uk.ac.bangor.meander.detectors.controlchart.MR;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 import uk.ac.bangor.meander.evaluators.BasicEvaluator;
 import uk.ac.bangor.meander.evaluators.Evaluation;
@@ -28,7 +29,7 @@ public class Evaluations {
 
         int W = 25;
 
-        Detector<Double[]> kl = new UnboxingDetectorAdapter(new KL(W, 3));
+        Detector<Double[]> kl = new FunctionalDetector(new KL(W, 3), new MR(), x -> x >= 50);
 
         evaluate(kl, arffStream);
 
@@ -48,7 +49,7 @@ public class Evaluations {
 
     private static void evaluate(Detector<Double[]> detector, ChangeStreamBuilder arffStream) {
 
-        Evaluator evaluator = new BasicEvaluator(50);
+        Evaluator evaluator = new BasicEvaluator();
         Evaluation evaluation = evaluator.evaluate(detector, arffStream, 10000, 1);
         log.info(evaluation.toString());
     }
