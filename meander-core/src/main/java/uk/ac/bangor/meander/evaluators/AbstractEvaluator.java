@@ -4,8 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import uk.ac.bangor.meander.detectors.Detector;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
+import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Will Faithfull
@@ -14,6 +17,7 @@ public abstract class AbstractEvaluator implements Evaluator {
 
     @Getter @Setter int allowEarly = 0;
     @Setter protected ProgressReporter progressReporter;
+    Map<Integer, Long> classDistribution = new HashMap<>();
 
     @Override
     public Evaluation evaluate(Detector<Double[]> detector, ChangeStreamBuilder changeStream, long limit, long n) {
@@ -24,5 +28,19 @@ public abstract class AbstractEvaluator implements Evaluator {
         }
 
         return new Evaluation(evaluations);
+    }
+
+    protected int getCurrentClass(StreamContext context) {
+        int currentClass = context.getLabel();
+
+        if(!classDistribution.containsKey(currentClass)) {
+            classDistribution.put(currentClass, 1L);
+        }
+
+        long classCount = classDistribution.get(currentClass);
+        classCount++;
+        classDistribution.put(currentClass, classCount);
+
+        return currentClass;
     }
 }

@@ -18,7 +18,7 @@ import uk.ac.bangor.meander.detectors.Detector;
  *
  * @author Will Faithfull
  */
-public class VoteDecayEnsemble extends AbstractMultivariateDetector {
+public class MultivariateVoteDecayEnsemble extends AbstractMultivariateDetector {
 
     private double               threshold;
     private DecayFunction        decayFunction;
@@ -27,12 +27,12 @@ public class VoteDecayEnsemble extends AbstractMultivariateDetector {
     private long[]               lastChange;
     private long n;
 
-    public VoteDecayEnsemble(double threshold, Detector<Double[]>... detectors) {
+    public MultivariateVoteDecayEnsemble(double threshold, Detector<Double[]>... detectors) {
         this(threshold, new LogisticDecayFunction(), detectors);
     }
 
 
-    public VoteDecayEnsemble(double threshold, DecayFunction decayFunction, Detector<Double[]>... detectors) {
+    public MultivariateVoteDecayEnsemble(double threshold, DecayFunction decayFunction, Detector<Double[]>... detectors) {
         this.threshold = threshold;
         this.decayFunction = decayFunction;
         this.detectors = detectors;

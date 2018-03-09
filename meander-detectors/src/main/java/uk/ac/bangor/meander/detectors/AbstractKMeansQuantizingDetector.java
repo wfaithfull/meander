@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * for orders of magnitude speed increase.
  */
 @Deprecated
-public abstract class AbstractKMeansQuantizingDetector {
+public abstract class AbstractKMeansQuantizingDetector extends AbstractMultivariateDetector {
 
     protected final WindowPair<double[]>                 windowPair;
     private final   KMeansPlusPlusClusterer<DoublePoint> clusterer;

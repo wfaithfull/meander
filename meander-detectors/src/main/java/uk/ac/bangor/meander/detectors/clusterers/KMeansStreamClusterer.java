@@ -26,6 +26,10 @@ public class KMeansStreamClusterer extends AbstractStreamClusterer implements St
             clusters[seen] = new CentroidCluster(example);
             assigned = seen;
         } else {
+            if(anyEmpty()) {
+                splitLargestCluster();
+            }
+
             int cluster = minimumSquaredEuclidean(example);
             clusters[cluster].add(example);
             assigned = cluster;
@@ -38,6 +42,54 @@ public class KMeansStreamClusterer extends AbstractStreamClusterer implements St
     @Override
     public void drop(int cluster, double[] example) {
         clusters[cluster].drop(example);
+    }
+
+    private boolean anyEmpty() {
+        for(Cluster cluster : clusters) {
+            if(cluster.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void splitLargestCluster() {
+        int maxWeight = 0;
+        int largestIdx = -1;
+        int emptyIdx = -1;
+
+        for(int i=0;i<k;i++) {
+            if(clusters[i].isEmpty()) {
+                emptyIdx = i;
+            } else if(clusters[i].getWeight() > maxWeight) {
+                maxWeight = clusters[i].getWeight();
+                largestIdx = i;
+            }
+        }
+
+        Cluster largest = clusters[largestIdx];
+
+        double[] std = largest.getStdDev();
+        double[] mean = largest.getCentre();
+        double[] newLargestCentre = new double[mean.length];
+        double[] newEmptyCentre = new double[mean.length];
+
+        for(int i=0;i<mean.length;i++) {
+            newLargestCentre[i] = mean[i] + std[i];
+            newEmptyCentre[i] = mean[i] - std[i];
+        }
+
+        int largestWeight,emptyWeight;
+        if(maxWeight % 2 != 0) {
+            emptyWeight = Math.floorDiv(maxWeight, 2);
+            largestWeight = emptyWeight + 1;
+        } else {
+            largestWeight = maxWeight / 2;
+            emptyWeight = largestWeight;
+        }
+
+        clusters[largestIdx] = new CentroidCluster(newLargestCentre, largestWeight);
+        clusters[emptyIdx] = new CentroidCluster(newEmptyCentre, emptyWeight);
     }
 
     private int minimumSquaredEuclidean(double[] example) {

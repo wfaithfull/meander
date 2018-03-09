@@ -59,7 +59,7 @@ public class KL extends AbstractClusteringQuantizingDetector implements Reductio
     @Override
     public void update(double[] input) {
         super.update(input);
-        change = change(getP(), getQ());
+        statistic = reduce(input);
     }
 
     private static ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -90,11 +90,16 @@ public class KL extends AbstractClusteringQuantizingDetector implements Reductio
 
     @Override
     public boolean decide(Double statistic) {
-        return false;
+        return ;
     }
 
     @Override
     public double reduce(Double[] example) {
-        return 0;
+        update(example);
+        addEps(p1);
+        addEps(p2);
+
+        double st = klDivergence(p1,p2);
+        this.statistic = st;
     }
 }

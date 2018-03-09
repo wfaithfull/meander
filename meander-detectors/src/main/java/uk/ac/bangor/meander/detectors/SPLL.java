@@ -11,13 +11,19 @@ import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 public class SPLL extends AbstractKMeansQuantizingDetector implements ReductionFunction, DecisionFunction {
 
     ChiSquaredDistribution cdf;
+    private double statistic;
 
     public SPLL(WindowPair<double[]> windowPair, int K) {
         super(windowPair, K);
     }
 
     @Override
-    public double reduce(Double[] example) {
+    public synchronized void update(Double[] input) {
+        statistic = reduce(input);
+    }
+
+    @Override
+    public synchronized double reduce(Double[] example) {
         super.update(example);
 
         double[] distances = getMinClusterToObservationDistances();
@@ -32,7 +38,7 @@ public class SPLL extends AbstractKMeansQuantizingDetector implements ReductionF
     }
 
     @Override
-    public boolean decide(Double statistic) {
+    public synchronized boolean decide(Double statistic) {
         if(cdf == null) {
             int df = getNFeatures();
 
@@ -47,5 +53,10 @@ public class SPLL extends AbstractKMeansQuantizingDetector implements ReductionF
             cumulativeProbability = 1-cumulativeProbability;
 
         return cumulativeProbability < 0.05;
+    }
+
+    @Override
+    public synchronized boolean isChangeDetected() {
+        return decide(statistic);
     }
 }

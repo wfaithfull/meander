@@ -49,7 +49,7 @@ public class Hotelling extends AbstractMultivariateDetector implements Reduction
     @Override
     public boolean decide(Double tsq) {
 
-        if(df1 < 0 || df2 < 0) {
+        if(df1 <= 0 || df2 <= 0) {
             return false;
         }
 

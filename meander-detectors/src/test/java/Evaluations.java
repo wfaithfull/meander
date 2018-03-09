@@ -29,10 +29,21 @@ public class Evaluations {
 
         int W = 25;
 
-        Detector<Double[]> kl = new FunctionalDetector(new KL(W, 3), new MR(), x -> x >= 50);
 
-        evaluate(kl, arffStream);
+        SPLL spll = new SPLL(new WindowPair<double[]>(W, W, double[].class),5);
+        Detector<Double[]> dspll1 = new FunctionalDetector(spll, spll, x -> x >= 50);
 
+
+        SPLL2 spll2 = new SPLL2(W,5);
+        Detector<Double[]> dspll2 = new FunctionalDetector(spll2, spll2, x -> x >= 50);
+
+        KL kl = new KL(W, 5);
+        Detector<Double[]> dkl = new FunctionalDetector(kl, kl, x -> x >= 50);
+
+
+        evaluate(dspll1, arffStream);
+        evaluate(dspll2, arffStream);
+        evaluate(dkl, arffStream);
         /*
         SPLL spll =  new SPLL(new WindowPair<>(W,W, double[].class), 3);
         Detector<Double[]> detector = new FunctionalDetector(spll, spll, n -> n >= 100);

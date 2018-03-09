@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * @author Will Faithfull
  */
-public abstract class AbstractClusteringQuantizingDetector extends AbstractUnboxingDetector {
+public abstract class AbstractClusteringQuantizingDetector extends AbstractUnboxingDetector implements ReductionFunction, DecisionFunction {
 
     private WindowPair<double[]> windowPair;
     protected ClusteringWindow w1, w2;
