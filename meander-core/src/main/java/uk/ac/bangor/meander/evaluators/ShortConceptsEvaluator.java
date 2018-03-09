@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 public class ShortConceptsEvaluator extends AbstractEvaluator {
 
     private static final long MAX_N = 3000000000L;
+
     @Override
     public Evaluation evaluate(Detector<Double[]> detector, Stream<Example> changeStream) {
 
@@ -43,6 +44,10 @@ public class ShortConceptsEvaluator extends AbstractEvaluator {
         LinkedList<Transition> transitions = new LinkedList<>();
 
         Transition transition = null;
+
+        if(progressReporter != null) {
+            progressReporter.update(n, "Evaluating " + detector.toString());
+        }
 
         int currentClass = 0;
         Set<Integer> changeClasses = new HashSet<>();
@@ -60,7 +65,7 @@ public class ShortConceptsEvaluator extends AbstractEvaluator {
                 changeClasses.addAll(Arrays.asList(ctx.getChangeLabels()));
             }
 
-            currentClass = ctx.getLabel();
+            currentClass = getCurrentClass(ctx);
 
             long index = ctx.getIndex();
             detector.update(example.getData());

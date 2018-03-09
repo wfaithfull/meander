@@ -86,8 +86,17 @@ public class Evaluation {
             this.ttd = n;
         }
 
-        this.mdr = missed / (double)transitions.size();
-        this.far = falseAlarms.size() / (double)n;
+        if(missed == 0 && transitions.size() == 0) {
+            this.mdr = Double.NaN;
+        } else {
+            this.mdr = missed / (double) transitions.size();
+        }
+
+        if(n == 0) {
+            this.far = Double.NaN;
+        } else {
+            this.far = falseAlarms.size() / (double) n;
+        }
     }
 
     private void computeDetections() {
@@ -98,18 +107,18 @@ public class Evaluation {
             // No detections means all transitions were missed.
             missed = this.transitions.size();
         } else {
-
             Iterator<Long> iterator = detections.iterator();
             long firstTn = transitions.get(0).getStart() - earlyDetection;
-            long detection;
-            do {
-                detection = iterator.next();
+            long detection = iterator.next();
+            while (detection < firstTn) {
                 falseAlarms.add(detection);
 
                 if(!iterator.hasNext()) {
                     break;
+                } else {
+                    detection = iterator.next();
                 }
-            } while (detection < firstTn);
+            }
 
             // Iterate transitions and find matching detections.
             for(int tIdx = 0; tIdx < this.transitions.size(); tIdx++) {
@@ -122,31 +131,30 @@ public class Evaluation {
 
                 // Was transition A detected?
                 boolean detected = false;
-                long bStart = b != null ? b.getStart() - earlyDetection : Long.MAX_VALUE;
+                long bStart = b != null ? b.getStart() - earlyDetection : n;
 
-                if(iterator.hasNext()) {
-                    do {
+                while (detection < bStart) {
+                    if (detection >= a.getStart() - earlyDetection) {
+                        if (detected) {
+                            this.falseAlarms.add(detection);
+                        } else {
+                            detected = true;
+                            this.ttds.add(detection - a.getStart());
+                        }
+                    }
+
+                    if(iterator.hasNext()) {
                         detection = iterator.next();
+                    } else {
+                        break;
+                    }
+                }
 
-                        if (detection > bStart) {
-
-                            if (!detected) {
-                                missed++;
-                            }
-
-                            break;
-                        }
-
-                        if (detection >= a.getStart() - earlyDetection && detection < bStart) {
-                            if (detected) {
-                                this.falseAlarms.add(detection);
-                            } else {
-                                detected = true;
-                                this.ttds.add(detection - a.getStart());
-                            }
-                        }
-                    } while (iterator.hasNext() && detection < bStart);
-                } else {
+                if (!detected && detection > bStart) {
+                    // Then next detection is for the next transition
+                    missed++;
+                } else if(!detected && !iterator.hasNext()) {
+                    // Then there are no more detections
                     missed++;
                 }
             }

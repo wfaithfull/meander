@@ -14,6 +14,7 @@ public class PrintStreamProgressBar implements ProgressReporter {
     private char character;
     private int width;
     private PrintStream printStream;
+    private String lastMessage = "";
 
     public PrintStreamProgressBar(char character, int width) {
         this(character, width, System.out);
@@ -29,7 +30,7 @@ public class PrintStreamProgressBar implements ProgressReporter {
 
     @Override
     public void update(long progress) {
-        update(progress, "");
+        update(progress, lastMessage);
     }
 
     @Override
@@ -38,7 +39,7 @@ public class PrintStreamProgressBar implements ProgressReporter {
     }
 
     public void update(long progress, long total) {
-        update(progress, total, "");
+        update(progress, total, lastMessage);
     }
 
     public char getSpinner() {
@@ -76,8 +77,10 @@ public class PrintStreamProgressBar implements ProgressReporter {
 
             lastTotal = total;
         } else {
-            printStream.printf("\r(%c) [%d] %s", spinner, progress, message);
+            printStream.printf("\r(%c) [%d] %s ", spinner, progress, message);
         }
+
+        lastMessage = message;
     }
 
     public void reset() {

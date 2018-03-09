@@ -38,6 +38,10 @@ public class BasicEvaluator extends AbstractEvaluator {
 
         Transition transition = null;
 
+        if(progressReporter != null) {
+            progressReporter.update(n, "Evaluating " + detector.toString());
+        }
+
         while(iterator.hasNext() && n < MAX_N) {
             Example example = iterator.next();
             StreamContext ctx = example.getContext();
