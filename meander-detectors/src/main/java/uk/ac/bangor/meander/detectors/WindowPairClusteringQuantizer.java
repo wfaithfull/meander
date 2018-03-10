@@ -1,5 +1,6 @@
 package uk.ac.bangor.meander.detectors;
 
+import lombok.Getter;
 import uk.ac.bangor.meander.detectors.clusterers.StreamClusterer;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindow;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
@@ -9,33 +10,33 @@ import java.util.function.Supplier;
 /**
  * @author Will Faithfull
  */
-public abstract class AbstractClusteringQuantizingDetector extends AbstractUnboxingDetector implements ReductionFunction, DecisionFunction {
+public class WindowPairClusteringQuantizer {
 
     private WindowPair<double[]> windowPair;
-    protected ClusteringWindow w1, w2;
+    private @Getter ClusteringWindow     w1, w2;
 
     double[] p;
     double[] q;
 
-    public AbstractClusteringQuantizingDetector(int size, Supplier<StreamClusterer> clustererSupplier) {
+    public WindowPairClusteringQuantizer(int size, Supplier<StreamClusterer> clustererSupplier) {
         w1 = new ClusteringWindow(size, clustererSupplier.get());
         w2 = new ClusteringWindow(size, clustererSupplier.get());
 
         windowPair = new WindowPair<>(w1, w2);
     }
 
-    public void update(double[] input) {
-        windowPair.update(input);
+    public void update(Double[] input) {
+        windowPair.update(CollectionUtils.unbox(input));
 
         p = w1.getClusterer().getDistribution();
         q = w2.getClusterer().getDistribution();
     }
 
-    protected double[] getP() {
+    public double[] getP() {
         return p;
     }
 
-    protected double[] getQ() {
+    public double[] getQ() {
         return q;
     }
 

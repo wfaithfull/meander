@@ -119,4 +119,20 @@ public class CollectionUtils {
         sb.append("]");
         return sb.toString();
     }
+
+    public static double[] unbox(Double[] input) {
+        double[] unboxed = new double[input.length];
+        for(int i=0;i<input.length;i++) {
+            unboxed[i] = input[i];
+        }
+        return unboxed;
+    }
+
+    public static Double[] box(double[] input) {
+        Double[] boxed = new Double[input.length];
+        for(int i=0;i<input.length;i++) {
+            boxed[i] = input[i];
+        }
+        return boxed;
+    }
 }

@@ -69,6 +69,7 @@ public class ShortConceptsEvaluator extends AbstractEvaluator {
 
             long index = ctx.getIndex();
             detector.update(example.getData());
+            detector.after(ctx);
 
             if(ctx.isChanging()) {
                 transition = ctx.getCurrentTransition().get();

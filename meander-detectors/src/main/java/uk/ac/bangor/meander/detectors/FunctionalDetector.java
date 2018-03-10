@@ -7,7 +7,7 @@ import java.util.function.Function;
 /**
  * @author Will Faithfull
  */
-public class FunctionalDetector implements Detector<Double[]>, ReductionFunction, DecisionFunction {
+public class FunctionalDetector extends AbstractFunctionalDetector {
 
     @Getter double statistic;
     boolean change;
@@ -40,8 +40,13 @@ public class FunctionalDetector implements Detector<Double[]>, ReductionFunction
     }
 
     @Override
-    public void reset() {
+    public State getState() {
+        return null;
+    }
 
+    @Override
+    public boolean ready() {
+        return false;
     }
 
     @Override

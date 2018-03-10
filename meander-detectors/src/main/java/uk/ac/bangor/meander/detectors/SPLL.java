@@ -3,6 +3,7 @@ package uk.ac.bangor.meander.detectors;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
+import uk.ac.bangor.meander.streams.StreamContext;
 
 /**
  * @author Will Faithfull
@@ -58,5 +59,15 @@ public class SPLL extends AbstractKMeansQuantizingDetector implements ReductionF
     @Override
     public synchronized boolean isChangeDetected() {
         return decide(statistic);
+    }
+
+    @Override
+    public boolean ready() {
+        return true;
+    }
+
+    @Override
+    public void after(StreamContext context) {
+
     }
 }

@@ -1,66 +1,30 @@
 package uk.ac.bangor.meander.detectors;
 
-import lombok.Getter;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.util.FastMath;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
-import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Will Faithfull
  */
 @Log
-public class KL extends AbstractClusteringQuantizingDetector implements ReductionFunction, DecisionFunction {
-
-    @Getter
-    private double statistic;
+public class KL extends AbstractFunctionalDetector {
 
     private int K;
 
-    private PrintWriter file;
+    private WindowPairClusteringQuantizer quantizer;
+    private double threshold, statistic;
 
     public KL(int size, int K) {
-        super(size, () -> new KMeansStreamClusterer(K));
+        quantizer = new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K));
         this.K = K;
         this.logK = Math.log(K);
-
-        try {
-            file = new PrintWriter("kl.txt");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     private double logK;
     private static double eps = 0.00001;
-    private boolean change;
-
-    protected boolean change(double[] p1, double[] p2) {
-        addEps(p1);
-        addEps(p2);
-
-        double st = klDivergence(p1,p2);
-        this.statistic = st;
-
-
-        double sumlogP1 = 0;
-        for(int i=0;i<p1.length;i++) {
-            sumlogP1 += Math.log(p1[i]);
-        }
-
-        file.write("" + statistic + ", " + (-logK - (sumlogP1/K)) + ";\n");
-        return st > -logK - (sumlogP1/K);
-    }
-
-    @Override
-    public void update(double[] input) {
-        super.update(input);
-        statistic = reduce(input);
-    }
 
     private static ThreadLocalRandom random = ThreadLocalRandom.current();
 
@@ -84,22 +48,50 @@ public class KL extends AbstractClusteringQuantizingDetector implements Reductio
     }
 
     @Override
-    public boolean isChangeDetected() {
-        return change;
-    }
-
-    @Override
-    public boolean decide(Double statistic) {
-        return ;
+    public boolean ready() {
+        return quantizer.getW1().isAtFullCapacity();
     }
 
     @Override
     public double reduce(Double[] example) {
-        update(example);
-        addEps(p1);
-        addEps(p2);
+        quantizer.update(example);
+        double[] p = quantizer.getP();
+        double[] q = quantizer.getQ();
 
-        double st = klDivergence(p1,p2);
-        this.statistic = st;
+        if(!ready()) {
+            return 0;
+        }
+
+        addEps(p);
+        addEps(q);
+
+        statistic = klDivergence(p,q);
+
+        return statistic;
+    }
+
+    public double getThreshold() {
+
+        if(!ready()) {
+            return 0;
+        }
+
+        double sumlogP = 0;
+        for(int i=0;i<quantizer.getP().length;i++) {
+            sumlogP += Math.log(quantizer.getP()[i]);
+        }
+
+        return -logK - (sumlogP/K);
+    }
+
+    @Override
+    public boolean decide(Double statistic) {
+        threshold = getThreshold();
+        return statistic > threshold;
+    }
+
+    @Override
+    public State getState() {
+        return new State(statistic, threshold);
     }
 }
