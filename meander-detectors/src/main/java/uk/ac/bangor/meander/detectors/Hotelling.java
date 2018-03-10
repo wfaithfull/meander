@@ -103,7 +103,9 @@ public class Hotelling extends AbstractMultivariateDetector implements Reduction
         else
             inverseCovariance = MatrixUtils.createRealIdentityMatrix((int)n);
 
-        double dist = meanW1.multiply(inverseCovariance).multiply(meanW2.transpose()).getEntry(0,0);
+        double dist = meanW1.subtract(meanW2)
+                .multiply(inverseCovariance)
+                .multiply(meanW1.subtract(meanW2).transpose()).getEntry(0,0);
 
         tsq = tsq * dist;
 
