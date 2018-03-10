@@ -92,6 +92,6 @@ public class KL extends AbstractFunctionalDetector {
 
     @Override
     public State getState() {
-        return new State(statistic, threshold);
+        return State.statisticAndThreshold(statistic, threshold);
     }
 }

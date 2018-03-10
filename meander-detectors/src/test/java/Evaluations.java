@@ -22,10 +22,10 @@ public class Evaluations {
 
         ChangeStreamBuilder arffStream = ChangeStreamBuilder
                 .fromArff("abalone.arff")
-                .withUniformClassMixture().fromStart();
-                /*.withClassMixture(1.0, 0.0, 0.0).transition(new AbruptTransition(2500))
+                .withUniformClassMixture().fromStart()
+                .withClassMixture(1.0, 0.0, 0.0).transition(new AbruptTransition(2500))
                 .withClassMixture(0.0, 1.0, 0.0).transition(new AbruptTransition(5000))
-                .withClassMixture(0.0, 0.0, 1.0).transition(new AbruptTransition(7500));*/
+                .withClassMixture(0.0, 0.0, 1.0).transition(new AbruptTransition(7500));
 
         int W = 25;
 
@@ -43,7 +43,7 @@ public class Evaluations {
         kl.setReporter(new JFreeChartReporter("KL"));
         //evaluate(dspll1, arffStream);
         //evaluate(dspll2, arffStream);
-        evaluate(kl, arffStream);
+        evaluate(new Hotelling(new WindowPair<double[]>(W, W, double[].class)), arffStream);
         /*
         SPLL spll =  new SPLL(new WindowPair<>(W,W, double[].class), 3);
         Detector<Double[]> detector = new FunctionalDetector(spll, spll, n -> n >= 100);

@@ -40,9 +40,9 @@ public class JFreeChartReporter extends JFrame implements ChartReporter {
     }
 
     @Override
-    public void report(State state) {
+    public void report(State... states) {
         n++;
-        statistic.add(n, state.getStatistic());
-        threshold.add(n, state.getThreshold());
+        statistic.add(n, states[0].getStatistic().get());
+        threshold.add(n, states[0].getThreshold().get());
     }
 }

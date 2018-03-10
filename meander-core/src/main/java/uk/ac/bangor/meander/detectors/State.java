@@ -29,6 +29,18 @@ public class State {
         return new State("empty");
     }
 
+    public static State statistic(double statistic) {
+        return new State("statistic", statistic);
+    }
+
+    public static State threshold(double threshold) {
+        return new State("threshold", null, threshold);
+    }
+
+    public static State statisticAndThreshold(double statistic, double threshold) {
+        return new State("statisticAndThreshold", statistic, threshold);
+    }
+
     String name;
     Optional<Double> statistic;
     Optional<Double> threshold;
