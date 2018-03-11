@@ -1,7 +1,5 @@
 package uk.ac.bangor.meander.detectors.pipes;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.commons.math3.distribution.FDistribution;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -9,7 +7,6 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.pipes.Distributions;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 
@@ -18,7 +15,7 @@ import uk.ac.bangor.meander.streams.StreamContext;
  */
 public class Hotelling {
 
-    public static class TsqReduction implements Pipe<Double[], Distributions.TsqState> {
+    public static class TsqReduction implements Pipe<Double[], CDF.FStatisticAndDegreesFreedom> {
 
         private static final int MAX_CONDITION = 10000;
         private WindowPair<double[]> windowPair;
@@ -61,7 +58,7 @@ public class Hotelling {
         }
 
         @Override
-        public Distributions.TsqState execute(Double[] value, StreamContext context) {
+        public CDF.FStatisticAndDegreesFreedom execute(Double[] value, StreamContext context) {
 
             windowPair.update(CollectionUtils.unbox(value));
 
@@ -104,7 +101,7 @@ public class Hotelling {
             df1 = (int)n;
             df2 = (int)(m1 + m2 - n - 1);
 
-            return new Distributions.TsqState(df1, df2, tsq);
+            return new CDF.FStatisticAndDegreesFreedom(df1, df2, tsq);
         }
     }
 
@@ -128,18 +125,18 @@ public class Hotelling {
 
     public static Pipe<Double[], Boolean> detector(int size) {
         return new TsqReduction(new WindowPair<>(size, size, double[].class))
-                .then(new Distributions.FDistributedProbability())
+                .then(new CDF.FWithDF())
                 .then(new Threshold());
     }
 
     public static Pipe<Double[], Double> tsqReduction(int size) {
         return new TsqReduction(new WindowPair<>(size, size, double[].class))
-                .then((value, context) -> value.getTsq());
+                .then((value, context) -> value.getStatistic());
     }
 
     public static Pipe<Double[], Double> fCumulativeProbability(int size) {
         return new TsqReduction(new WindowPair<>(size, size, double[].class))
-                .then(new Distributions.FDistributedProbability());
+                .then(new CDF.FWithDF());
     }
 
 }
