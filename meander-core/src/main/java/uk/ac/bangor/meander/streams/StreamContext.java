@@ -21,6 +21,7 @@ public class StreamContext {
     private                                              Transition       mostRecent;
     @Getter @Setter(AccessLevel.PACKAGE) private         double[]         sourcePriors;
     private                                              List<double[]>  classPriors;
+    @Getter private                                      int dimensionality;
     @Getter @Setter(AccessLevel.PACKAGE) private         boolean finished;
     @Getter @Setter private                              Integer[] changeLabels;
 
@@ -69,7 +70,7 @@ public class StreamContext {
         return jointClassPriors;
     }
 
-    void advance() {
+    void advance(Example example) {
         index++;
         classPriors = new LinkedList<>();
     }

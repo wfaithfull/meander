@@ -3,6 +3,7 @@ package uk.ac.bangor.meander.evaluators;
 import lombok.Getter;
 import lombok.Setter;
 import uk.ac.bangor.meander.detectors.Detector;
+import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.streams.StreamContext;
 
@@ -20,7 +21,7 @@ public abstract class AbstractEvaluator implements Evaluator {
     Map<Integer, Long> classDistribution = new HashMap<>();
 
     @Override
-    public Evaluation evaluate(Detector<Double[]> detector, ChangeStreamBuilder changeStream, long limit, long n) {
+    public Evaluation evaluate(Pipe<Double[],Boolean> detector, ChangeStreamBuilder changeStream, long limit, long n) {
         ArrayList<Evaluation> evaluations= new ArrayList<>();
 
         for(int i=0; i<n; i++) {

@@ -1,6 +1,8 @@
-package uk.ac.bangor.meander.detectors;
+package uk.ac.bangor.meander.detectors.pipes;
 
 import moa.classifiers.core.driftdetection.*;
+import uk.ac.bangor.meander.detectors.Pipe;
+import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,22 +12,12 @@ import java.util.List;
  *
  * Adapts the univariate change detectors from MOA into the meander format.
  */
-public class MoaDetectorAdapter extends AbstractUnivariateDetector {
+public class MoaDetectorAdapter implements Pipe<Double, Boolean> {
 
     private ChangeDetector moaDetector;
     public MoaDetectorAdapter(ChangeDetector moaDetector) {
         this.moaDetector = moaDetector;
         this.moaDetector.prepareForUse();
-    }
-
-    @Override
-    public void update(Double example) {
-        moaDetector.input(example);
-    }
-
-    @Override
-    public boolean isChangeDetected() {
-        return moaDetector.getChange();
     }
 
     public static MoaDetectorAdapter cusum() {
@@ -76,8 +68,8 @@ public class MoaDetectorAdapter extends AbstractUnivariateDetector {
         return new MoaDetectorAdapter(new SeqDrift2ChangeDetector());
     }
 
-    public static List<Detector<Double>> allMoaDetectors() {
-        ArrayList<Detector<Double>> detectors = new ArrayList<>();
+    public static List<Pipe<Double, Boolean>> allMoaDetectors() {
+        ArrayList<Pipe<Double,Boolean>> detectors = new ArrayList<>();
         detectors.add(cusum());
         detectors.add(adwin());
         detectors.add(ddm());
@@ -91,5 +83,11 @@ public class MoaDetectorAdapter extends AbstractUnivariateDetector {
         detectors.add(seq1());
         detectors.add(seq2());
         return detectors;
+    }
+
+    @Override
+    public Boolean execute(Double value, StreamContext context) {
+        moaDetector.input(value);
+        return moaDetector.getChange();
     }
 }

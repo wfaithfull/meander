@@ -2,12 +2,14 @@ package uk.ac.bangor.meander.detectors.preprocessors;
 
 import Jama.Matrix;
 import Jama.SingularValueDecomposition;
+import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.stats.MultivariateIncrementalStatistics;
+import uk.ac.bangor.meander.streams.StreamContext;
 
 /**
  * @author Will Faithfull
  */
-public class IPCA {
+public class IPCA implements Pipe<Double[], Double[]> {
 
     private MultivariateIncrementalStatistics incrementalStatistics;
 
@@ -36,4 +38,8 @@ public class IPCA {
         SingularValueDecomposition decomposition = new SingularValueDecomposition(X);
     }
 
+    @Override
+    public Double[] execute(Double[] value, StreamContext context) {
+        return new Double[0];
+    }
 }

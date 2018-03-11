@@ -1,19 +1,21 @@
 package uk.ac.bangor.meander.detectors.controlchart;
 
+import uk.ac.bangor.meander.streams.StreamContext;
+
 /**
  * Shewhart individuals moving range chart which thresholds the individual values.
  *
  * @author Will Faithfull
  */
-public class IMR extends MR {
+public class IMR extends MR.MRLimits {
 
     @Override
-    public boolean isChangeDetected() {
+    public Boolean execute(MR.MRState value, StreamContext context) {
 
-        double ucl = statistics.mean() + (2.66 * center);
-        double lcl = statistics.mean() - (2.66 * center);
+        double ucl = value.getStatistics().mean() + (2.66 * value.getCenter());
+        double lcl = value.getStatistics().mean() - (2.66 * value.getCenter());
 
-        return last > ucl || last < lcl;
+        return value.getLast() > ucl || value.getLast() < lcl;
     }
 
 }

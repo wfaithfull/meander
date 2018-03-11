@@ -3,6 +3,7 @@ package uk.ac.bangor.meander.evaluators;
 import lombok.Setter;
 import lombok.extern.java.Log;
 import uk.ac.bangor.meander.detectors.Detector;
+import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.Example;
 import uk.ac.bangor.meander.streams.StreamContext;
 import uk.ac.bangor.meander.transitions.Transition;
@@ -34,7 +35,7 @@ public class ShortConceptsEvaluator extends AbstractEvaluator {
     private static final long MAX_N = 3000000000L;
 
     @Override
-    public Evaluation evaluate(Detector<Double[]> detector, Stream<Example> changeStream) {
+    public Evaluation evaluate(Pipe<Double[],Boolean> detector, Stream<Example> changeStream) {
 
         Iterator<Example> iterator = changeStream.iterator();
 
@@ -68,8 +69,7 @@ public class ShortConceptsEvaluator extends AbstractEvaluator {
             currentClass = getCurrentClass(ctx);
 
             long index = ctx.getIndex();
-            detector.update(example.getData());
-            detector.after(ctx);
+            boolean detection = detector.execute(example.getData(), ctx);
 
             if(ctx.isChanging()) {
                 transition = ctx.getCurrentTransition().get();
@@ -84,7 +84,7 @@ public class ShortConceptsEvaluator extends AbstractEvaluator {
                 }
             }
 
-            if(detector.isChangeDetected()) {
+            if(detection) {
                 detections.add(index);
             }
 

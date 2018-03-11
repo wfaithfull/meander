@@ -1,16 +1,18 @@
 import lombok.extern.java.Log;
 import uk.ac.bangor.meander.detectors.*;
+import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.controlchart.MR;
+import uk.ac.bangor.meander.detectors.pipes.KL;
+import uk.ac.bangor.meander.detectors.pipes.SPLL;
+import uk.ac.bangor.meander.detectors.pipes.SPLL2;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 import uk.ac.bangor.meander.evaluators.BasicEvaluator;
 import uk.ac.bangor.meander.evaluators.Evaluation;
 import uk.ac.bangor.meander.evaluators.Evaluator;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
-import uk.ac.bangor.meander.streams.Example;
 import uk.ac.bangor.meander.transitions.AbruptTransition;
 
 import java.io.IOException;
-import java.util.stream.Stream;
 
 /**
  * @author Will Faithfull
@@ -30,20 +32,21 @@ public class Evaluations {
         int W = 25;
 
 
-        SPLL spll = new SPLL(new WindowPair<double[]>(W, W, double[].class),5);
-        Detector<Double[]> dspll1 = new FunctionalDetector(spll, spll, x -> x >= 50);
+        Pipe<Double[], Boolean> spll = new SPLL(new WindowPair<double[]>(W, W, double[].class),5)
+                .then(new SPLL2.ChiSquareProbability())
+                .then(new SPLL2.Threshold());
+
+        Pipe<Double[], Boolean> detector = SPLL2.detector(W, 3);
+
+        Pipe kl = KL.reduction(W,3)
+                .then(new MR.MRReduction())
+                .then(new MR.MRLimits());
 
 
-        SPLL2 spll2 = new SPLL2(W,5);
-        Detector<Double[]> dspll2 = new FunctionalDetector(spll2, spll2, x -> x >= 50);
-
-        KL kl = new KL(W, 3);
-        Detector<Double[]> dkl = new FunctionalDetector(kl, kl, x -> x >= 50);
-
-        kl.setReporter(new JFreeChartReporter("KL"));
+        //kl.setReporter(new JFreeChartReporter("KL"));
         //evaluate(dspll1, arffStream);
         //evaluate(dspll2, arffStream);
-        evaluate(new Hotelling(new WindowPair<double[]>(W, W, double[].class)), arffStream);
+        evaluate(kl, arffStream);
         /*
         SPLL spll =  new SPLL(new WindowPair<>(W,W, double[].class), 3);
         Detector<Double[]> detector = new FunctionalDetector(spll, spll, n -> n >= 100);
@@ -58,7 +61,7 @@ public class Evaluations {
         evaluate(detector3, arffStream);*/
     }
 
-    private static void evaluate(Detector<Double[]> detector, ChangeStreamBuilder arffStream) {
+    private static void evaluate(Pipe<Double[],Boolean> detector, ChangeStreamBuilder arffStream) {
 
         Evaluator evaluator = new BasicEvaluator();
         Evaluation evaluation = evaluator.evaluate(detector, arffStream, 10000, 1);

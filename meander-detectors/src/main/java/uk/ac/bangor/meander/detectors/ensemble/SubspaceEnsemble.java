@@ -3,20 +3,22 @@ package uk.ac.bangor.meander.detectors.ensemble;
 import uk.ac.bangor.meander.MeanderException;
 import uk.ac.bangor.meander.detectors.AbstractMultivariateDetector;
 import uk.ac.bangor.meander.detectors.Detector;
+import uk.ac.bangor.meander.detectors.Pipe;
+import uk.ac.bangor.meander.streams.StreamContext;
 
 /**
  * @author Will Faithfull
  */
-public class SubspaceEnsemble extends AbstractMultivariateDetector {
+public class SubspaceEnsemble implements Pipe<Double[], Boolean[]> {
 
     private double threshold;
     private Detector<Double>[] detectors;
-    private boolean[] votes;
+    private Boolean[] votes;
 
     public SubspaceEnsemble(double threshold, Detector<Double>... detectors) {
         this.threshold = threshold;
         this.detectors = detectors;
-        this.votes = new boolean[detectors.length];
+        this.votes = new Boolean[detectors.length];
     }
 
     public SubspaceEnsemble(Detector<Double>... detectors) {
@@ -24,26 +26,16 @@ public class SubspaceEnsemble extends AbstractMultivariateDetector {
     }
 
     @Override
-    public void update(Double[] input) {
-        if(input.length != detectors.length) {
+    public Boolean[] execute(Double[] value, StreamContext context)  {
+        if(value.length != detectors.length) {
             throw new MeanderException("Number of detectors must equal number of features!");
         }
 
         for(int i=0;i<detectors.length;i++) {
-            detectors[i].update(input[i]);
+            detectors[i].update(value[i]);
             votes[i] = detectors[i].isChangeDetected();
         }
-    }
 
-    @Override
-    public boolean isChangeDetected() {
-
-        int total = 0;
-        for(boolean vote : votes) {
-            if(vote)
-                total++;
-        }
-
-        return (total / (double)detectors.length) > threshold;
+        return votes;
     }
 }

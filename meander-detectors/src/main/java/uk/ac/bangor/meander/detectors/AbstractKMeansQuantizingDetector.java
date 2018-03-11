@@ -39,11 +39,11 @@ import java.util.stream.Collectors;
  *
  * ** Deprecated because this is super slow compared to stream clustering. **
  *
- * Use {@link AbstractClusteringQuantizingDetector} instead which uses the baked in stream clustering framework
+ * Use {@link WindowPairClusteringQuantizer} instead which uses the baked in stream clustering framework
  * for orders of magnitude speed increase.
  */
 @Deprecated
-public abstract class AbstractKMeansQuantizingDetector extends AbstractMultivariateDetector {
+public abstract class AbstractKMeansQuantizingDetector {
 
     protected final WindowPair<double[]>                 windowPair;
     private final   KMeansPlusPlusClusterer<DoublePoint> clusterer;

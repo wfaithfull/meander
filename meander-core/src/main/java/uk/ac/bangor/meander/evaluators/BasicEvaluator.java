@@ -2,6 +2,7 @@ package uk.ac.bangor.meander.evaluators;
 
 import lombok.extern.java.Log;
 import uk.ac.bangor.meander.detectors.Detector;
+import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.streams.Example;
 import uk.ac.bangor.meander.streams.StreamContext;
@@ -27,7 +28,7 @@ public class BasicEvaluator extends AbstractEvaluator {
     private static final long MAX_N = 3000000000L;
 
     @Override
-    public Evaluation evaluate(Detector<Double[]> detector, Stream<Example> changeStream) {
+    public Evaluation evaluate(Pipe<Double[], Boolean> detector, Stream<Example> changeStream) {
 
         Iterator<Example> iterator = changeStream.iterator();
 
@@ -51,8 +52,7 @@ public class BasicEvaluator extends AbstractEvaluator {
             }
 
             long index = ctx.getIndex();
-            detector.update(example.getData());
-            detector.after(ctx);
+            boolean detection = detector.execute(example.getData(), ctx);
 
             if(ctx.isChanging()) {
                 transition = ctx.getCurrentTransition().get();
@@ -61,7 +61,7 @@ public class BasicEvaluator extends AbstractEvaluator {
                 }
             }
 
-            if(detector.isChangeDetected()) {
+            if(detection) {
                 detections.add(index);
             }
 

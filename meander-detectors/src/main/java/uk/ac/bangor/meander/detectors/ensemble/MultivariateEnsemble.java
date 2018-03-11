@@ -2,39 +2,29 @@ package uk.ac.bangor.meander.detectors.ensemble;
 
 import uk.ac.bangor.meander.detectors.AbstractMultivariateDetector;
 import uk.ac.bangor.meander.detectors.Detector;
+import uk.ac.bangor.meander.detectors.Pipe;
+import uk.ac.bangor.meander.streams.StreamContext;
 
 /**
  * @author Will Faithfull
  */
-public class MultivariateEnsemble extends AbstractMultivariateDetector {
+public class MultivariateEnsemble implements Pipe<Double[], Boolean[]> {
 
-    private double          threshold;
     private Detector<Double[]>[] detectors;
-    private boolean[]          votes;
+    private Boolean[]          votes;
 
-    public MultivariateEnsemble(double threshold, Detector<Double[]>... detectors) {
-        this.threshold = threshold;
+    public MultivariateEnsemble(Detector<Double[]>... detectors) {
         this.detectors = detectors;
-        this.votes = new boolean[detectors.length];
+        this.votes = new Boolean[detectors.length];
     }
 
     @Override
-    public void update(Double[] input) {
+    public Boolean[] execute(Double[] value, StreamContext context) {
         for (int i=0;i<detectors.length;i++) {
-            detectors[i].update(input);
+            detectors[i].update(value);
             votes[i] = detectors[i].isChangeDetected();
         }
-    }
 
-    @Override
-    public boolean isChangeDetected() {
-
-        int total = 0;
-        for(boolean vote : votes) {
-            if(vote)
-                total++;
-        }
-
-        return (total / (double)detectors.length) > threshold;
+        return votes;
     }
 }

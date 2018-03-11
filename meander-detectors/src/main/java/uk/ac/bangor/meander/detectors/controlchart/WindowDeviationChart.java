@@ -13,7 +13,7 @@ import uk.ac.bangor.meander.detectors.windowing.Window;
  *
  * @author Will Faithfull
  */
-public class WindowDeviationChart extends AbstractUnivariateDetector {
+public class WindowDeviationChart {
 
     private Window<Double> window;
     private double         sqrt_T;
@@ -29,12 +29,10 @@ public class WindowDeviationChart extends AbstractUnivariateDetector {
         this(wsz, 1.96);
     }
 
-    @Override
     public void update(Double input) {
         window.update(input);
     }
 
-    @Override
     public boolean isChangeDetected() {
         double mean = mean();
         double lim = alpha*(std(mean)/sqrt_T);

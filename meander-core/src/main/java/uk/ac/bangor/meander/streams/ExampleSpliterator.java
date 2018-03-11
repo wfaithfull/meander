@@ -34,8 +34,9 @@ class ExampleSpliterator implements Spliterator<Example> {
         if(context.isFinished())
             return false;
 
-        action.accept(source.getProvider().apply(context));
-        context.advance();
+        Example example = source.getProvider().apply(context);
+        action.accept(example);
+        context.advance(example);
         return !context.isFinished();
     }
 
