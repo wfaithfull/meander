@@ -1,7 +1,5 @@
 package uk.ac.bangor.meander.detectors.ensemble;
 
-import uk.ac.bangor.meander.detectors.AbstractMultivariateDetector;
-import uk.ac.bangor.meander.detectors.Detector;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.StreamContext;
 
@@ -10,10 +8,10 @@ import uk.ac.bangor.meander.streams.StreamContext;
  */
 public class MultivariateEnsemble implements Pipe<Double[], Boolean[]> {
 
-    private Detector<Double[]>[] detectors;
+    private Pipe<Double[], Boolean>[] detectors;
     private Boolean[]          votes;
 
-    public MultivariateEnsemble(Detector<Double[]>... detectors) {
+    public MultivariateEnsemble(Pipe<Double[], Boolean>... detectors) {
         this.detectors = detectors;
         this.votes = new Boolean[detectors.length];
     }
@@ -21,8 +19,7 @@ public class MultivariateEnsemble implements Pipe<Double[], Boolean[]> {
     @Override
     public Boolean[] execute(Double[] value, StreamContext context) {
         for (int i=0;i<detectors.length;i++) {
-            detectors[i].update(value);
-            votes[i] = detectors[i].isChangeDetected();
+            votes[i] = detectors[i].execute(value, context);
         }
 
         return votes;

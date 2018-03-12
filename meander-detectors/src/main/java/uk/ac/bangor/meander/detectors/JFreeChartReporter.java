@@ -5,6 +5,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import uk.ac.bangor.meander.streams.StreamContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,16 +16,18 @@ import java.awt.*;
 public class JFreeChartReporter extends JFrame implements ChartReporter {
 
     XYSeries statistic;
-    XYSeries threshold;
-    private int n = 0;
+    XYSeries ucl;
+    XYSeries lcl;
 
     public JFreeChartReporter(String title) {
         statistic = new XYSeries("Statistic");
-        threshold = new XYSeries("Threshold");
+        ucl = new XYSeries("UCL");
+        lcl = new XYSeries("LCL");
 
         XYSeriesCollection collection = new XYSeriesCollection();
         collection.addSeries(statistic);
-        collection.addSeries(threshold);
+        collection.addSeries(ucl);
+        collection.addSeries(lcl);
 
         JFreeChart chart = ChartFactory.createXYLineChart(
                 title, "Time", "Statistic", collection);
@@ -40,9 +43,17 @@ public class JFreeChartReporter extends JFrame implements ChartReporter {
     }
 
     @Override
-    public void report(State... states) {
-        n++;
-        statistic.add(n, states[0].getStatistic().get());
-        threshold.add(n, states[0].getThreshold().get());
+    public void statistic(double statistic, Pipe pipe, StreamContext context) {
+        this.statistic.add(context.getIndex(), statistic);
+    }
+
+    @Override
+    public void ucl(double ucl, Pipe pipe, StreamContext context) {
+        this.ucl.add(context.getIndex(), ucl);
+    }
+
+    @Override
+    public void lcl(double lcl, Pipe pipe, StreamContext context) {
+        this.lcl.add(context.getIndex(), lcl);
     }
 }

@@ -3,7 +3,6 @@ package uk.ac.bangor.meander.detectors.controlchart;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import uk.ac.bangor.meander.detectors.AbstractUnivariateDetector;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.stats.IncrementalStatistics;
 import uk.ac.bangor.meander.streams.StreamContext;

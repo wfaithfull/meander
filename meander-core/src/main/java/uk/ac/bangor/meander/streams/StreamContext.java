@@ -72,6 +72,7 @@ public class StreamContext {
 
     void advance(Example example) {
         index++;
+        this.dimensionality = example.getData().length;
         classPriors = new LinkedList<>();
     }
 

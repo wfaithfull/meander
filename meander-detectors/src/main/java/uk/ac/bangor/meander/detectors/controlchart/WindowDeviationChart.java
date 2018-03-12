@@ -1,6 +1,5 @@
 package uk.ac.bangor.meander.detectors.controlchart;
 
-import uk.ac.bangor.meander.detectors.AbstractUnivariateDetector;
 import uk.ac.bangor.meander.detectors.windowing.FixedWindow;
 import uk.ac.bangor.meander.detectors.windowing.Window;
 

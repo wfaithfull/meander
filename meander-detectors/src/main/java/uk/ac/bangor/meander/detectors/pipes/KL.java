@@ -77,23 +77,29 @@ public class KL  {
         }
     }
 
-    public static class LikelihoodRatioThreshold implements Pipe<KLState, Boolean> {
-
+    public static class LikelihoodRatioThreshold implements Pipe<KLState, Double> {
         @Override
-        public Boolean execute(KLState value, StreamContext context) {
+        public Double execute(KLState value, StreamContext context) {
 
             double sumlogP = 0;
             for (int i = 0; i < value.getP().length; i++) {
                 sumlogP += Math.log(value.getP()[i]);
             }
 
-            return value.getStatistic() > -Math.log(value.getK()) - (sumlogP / value.getK());
+            return -Math.log(value.getK()) - (sumlogP / value.getK());
+        }
+    }
+
+    public static class KLStateStatistic implements Pipe<KLState, Double> {
+        @Override
+        public Double execute(KLState value, StreamContext context) {
+            return value.getStatistic();
         }
     }
 
     public static Pipe<Double[], Boolean> detector(int size, int K) {
         return new KLReduction(size, K)
-                .then(new LikelihoodRatioThreshold());
+                .then(new Threshold<>(Threshold.Op.GT, new LikelihoodRatioThreshold(), new KLStateStatistic()));
     }
 
     public static Pipe<Double[], Double> reduction(int size, int K) {

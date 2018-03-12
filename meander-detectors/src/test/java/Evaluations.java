@@ -1,10 +1,12 @@
 import lombok.extern.java.Log;
-import uk.ac.bangor.meander.detectors.*;
+import uk.ac.bangor.meander.detectors.JFreeChartReporter;
 import uk.ac.bangor.meander.detectors.Pipe;
+import uk.ac.bangor.meander.detectors.ReportPipe;
 import uk.ac.bangor.meander.detectors.controlchart.MR;
-import uk.ac.bangor.meander.detectors.pipes.KL;
-import uk.ac.bangor.meander.detectors.pipes.SPLL;
-import uk.ac.bangor.meander.detectors.pipes.SPLL2;
+import uk.ac.bangor.meander.detectors.ensemble.DecayingMajority;
+import uk.ac.bangor.meander.detectors.ensemble.LogisticDecayFunction;
+import uk.ac.bangor.meander.detectors.ensemble.SubspaceEnsemble;
+import uk.ac.bangor.meander.detectors.pipes.*;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 import uk.ac.bangor.meander.evaluators.BasicEvaluator;
 import uk.ac.bangor.meander.evaluators.Evaluation;
@@ -13,6 +15,7 @@ import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.transitions.AbruptTransition;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 /**
  * @author Will Faithfull
@@ -31,34 +34,27 @@ public class Evaluations {
 
         int W = 25;
 
-
+        JFreeChartReporter reporter = new JFreeChartReporter("Subspace");
         Pipe<Double[], Boolean> spll = new SPLL(new WindowPair<double[]>(W, W, double[].class),5)
-                .then(new SPLL2.ChiSquareProbability())
-                .then(new SPLL2.Threshold());
+                .then(new CDF.ChiSquared(), reporter::statistic)
+                .then(Threshold.lessThan(0.05).report(reporter::lcl));
 
         Pipe<Double[], Boolean> detector = SPLL2.detector(W, 3);
 
-        Pipe kl = KL.reduction(W,3)
-                .then(new MR.MRReduction())
-                .then(new MR.MRLimits());
+
+        Pipe kl = new KL.KLReduction(W, 3)
+                .then(new ReportPipe<>(reporter::statistic, KL.KLState::getStatistic))
+                .then(new Threshold<>(Threshold.Op.GT, new KL.LikelihoodRatioThreshold(), new KL.KLStateStatistic())
+                .report(reporter::ucl));
+
+        Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MR.MRReduction().then(new MR.MRLimits());
 
 
-        //kl.setReporter(new JFreeChartReporter("KL"));
-        //evaluate(dspll1, arffStream);
-        //evaluate(dspll2, arffStream);
-        evaluate(kl, arffStream);
-        /*
-        SPLL spll =  new SPLL(new WindowPair<>(W,W, double[].class), 3);
-        Detector<Double[]> detector = new FunctionalDetector(spll, spll, n -> n >= 100);
-        evaluate(detector, arffStream);
+        Pipe<Double[], Boolean> subspace = new SubspaceEnsemble(mrSupplier)
+                .then(new DecayingMajority(new LogisticDecayFunction()), reporter::statistic)
+                .then(Threshold.greaterThan(.25).report(reporter::ucl));
 
-        spll =  new SPLL(new WindowPair<>(W,W, double[].class), 3);
-        Detector<Double[]> detector2 = new FunctionalDetector(spll, new DetectorDecisionFunctionAdapter(MoaDetectorAdapter.cusum()), n -> n >= 100);
-        evaluate(detector2, arffStream);
-
-        spll =  new SPLL(new WindowPair<>(W,W, double[].class), 3);
-        Detector<Double[]> detector3 = new FunctionalDetector(spll, new DetectorDecisionFunctionAdapter(MoaDetectorAdapter.pageHinkley()), n -> n >= 100);
-        evaluate(detector3, arffStream);*/
+        evaluate(subspace, arffStream);
     }
 
     private static void evaluate(Pipe<Double[],Boolean> detector, ChangeStreamBuilder arffStream) {

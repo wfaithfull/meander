@@ -116,28 +116,9 @@ public class SPLL2 {
 
     }
 
-    public static class Threshold implements Pipe<Double, Boolean> {
-
-        private double threshold;
-
-        public Threshold(double threshold) {
-            this.threshold = threshold;
-        }
-
-        public Threshold() {
-            this(0.05);
-        }
-
-        @Override
-        public Boolean execute(Double value, StreamContext context) {
-            return value < threshold;
-        }
-    }
-
     public static Pipe<Double[], Boolean> detector(int size, int K) {
-        return new SPLLReduction(size, K)
-                .then(new CDF.ChiSquared())
-                .then(new Threshold());
+        return chiSq(size,K)
+                .then(Threshold.lessThan(0.05));
     }
 
     public static Pipe<Double[], Double> st(int size, int K) {

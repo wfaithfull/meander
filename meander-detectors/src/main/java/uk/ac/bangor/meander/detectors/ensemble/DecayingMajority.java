@@ -6,24 +6,22 @@ import uk.ac.bangor.meander.streams.StreamContext;
 /**
  * Created by wfaithfull on 11/03/18.
  */
-public class DecayingMajority implements Pipe<Boolean[], Boolean> {
+public class DecayingMajority implements Pipe<Boolean[], Double> {
 
-    public DecayingMajority(DecayFunction decayFunction, double threshold) {
+    public DecayingMajority(DecayFunction decayFunction) {
         this.decayFunction = decayFunction;
-        this.threshold = threshold;
     }
 
     public DecayingMajority() {
-        this(new LogisticDecayFunction(), 0.5);
+        this(new LogisticDecayFunction());
     }
 
-    private double threshold;
     private double[] votes;
     private long[] lastChange;
     private DecayFunction decayFunction;
 
     @Override
-    public Boolean execute(Boolean[] value, StreamContext context) {
+    public Double execute(Boolean[] value, StreamContext context) {
 
         if(votes == null) {
             votes = new double[value.length];
@@ -44,6 +42,6 @@ public class DecayingMajority implements Pipe<Boolean[], Boolean> {
             total += vote;
         }
 
-        return (total / (double)value.length) > threshold;
+        return (total / (double)value.length);
     }
 }
