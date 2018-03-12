@@ -2,7 +2,6 @@ package uk.ac.bangor.meander.evaluators;
 
 import lombok.Getter;
 import lombok.Setter;
-import uk.ac.bangor.meander.detectors.Detector;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.streams.StreamContext;
