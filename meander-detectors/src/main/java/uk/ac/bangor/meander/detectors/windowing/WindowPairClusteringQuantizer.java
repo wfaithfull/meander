@@ -2,35 +2,35 @@ package uk.ac.bangor.meander.detectors.windowing;
 
 import lombok.Getter;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
+import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.clusterers.StreamClusterer;
-import uk.ac.bangor.meander.detectors.windowing.ClusteringWindow;
-import uk.ac.bangor.meander.detectors.windowing.WindowPair;
+import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.function.Supplier;
 
 /**
  * @author Will Faithfull
  */
-public class WindowPairClusteringQuantizer {
+public class WindowPairClusteringQuantizer implements Pipe<Double[], DistributionPair> {
 
-    private WindowPair<double[]> windowPair;
-    private @Getter ClusteringWindow     w1, w2;
+    private WindowPair<double[]>     windowPair;
+    private @Getter ClusteringWindow tail, head;
 
     double[] p;
     double[] q;
 
     public WindowPairClusteringQuantizer(int size, Supplier<StreamClusterer> clustererSupplier) {
-        w1 = new ClusteringWindow(size, clustererSupplier.get());
-        w2 = new ClusteringWindow(size, clustererSupplier.get());
+        tail = new ClusteringWindow(size, clustererSupplier.get());
+        head = new ClusteringWindow(size, clustererSupplier.get());
 
-        windowPair = new WindowPair<>(w1, w2);
+        windowPair = new WindowPair<>(tail, head);
     }
 
     public void update(Double[] input) {
         windowPair.update(CollectionUtils.unbox(input));
 
-        p = w1.getClusterer().getDistribution();
-        q = w2.getClusterer().getDistribution();
+        p = tail.getClusterer().getDistribution();
+        q = head.getClusterer().getDistribution();
     }
 
     public double[] getP() {
@@ -41,4 +41,14 @@ public class WindowPairClusteringQuantizer {
         return q;
     }
 
+    @Override
+    public DistributionPair execute(Double[] value, StreamContext context) {
+        update(value);
+        return new DistributionPair(getP(), getQ());
+    }
+
+    @Override
+    public boolean ready() {
+        return tail.isAtFullCapacity();
+    }
 }

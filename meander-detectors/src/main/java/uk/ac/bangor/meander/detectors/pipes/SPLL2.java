@@ -2,7 +2,7 @@ package uk.ac.bangor.meander.detectors.pipes;
 
 import Jama.Matrix;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.WindowPairClusteringQuantizer;
+import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 import uk.ac.bangor.meander.detectors.clusterers.Cluster;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.streams.StreamContext;
@@ -28,7 +28,7 @@ public class SPLL2 {
         }
 
         public boolean ready() {
-            return quantizer.getW1().isAtFullCapacity();
+            return quantizer.getTail().isAtFullCapacity();
         }
 
         public double reduce(Double[] example) {
@@ -53,9 +53,9 @@ public class SPLL2 {
             double[] distributionW1 = quantizer.getP();
             double[] distributionW2 = new double[distributionW1.length];
 
-            List<Cluster> w1Clusters = quantizer.getW1().getClusterer().getClusters();
+            List<Cluster> w1Clusters = quantizer.getTail().getClusterer().getClusters();
 
-            double[] clusterToExampleDistances = new double[quantizer.getW1().size()];
+            double[] clusterToExampleDistances = new double[quantizer.getTail().size()];
 
             Matrix pooledCovarianceW1 = new Matrix(example.length, example.length);
             for(int k=0;k<w1Clusters.size();k++) {
@@ -71,8 +71,8 @@ public class SPLL2 {
             double minDist = Double.POSITIVE_INFINITY;
             int minDistIndex = -1;
 
-            for(int i = 0; i < quantizer.getW2().size(); i++) {
-                double[] w2Example = quantizer.getW2().get(i);
+            for(int i = 0; i < quantizer.getHead().size(); i++) {
+                double[] w2Example = quantizer.getHead().get(i);
                 for(int k = 0; k < w1Clusters.size(); k++) {
                     Cluster cluster = w1Clusters.get(k);
 
@@ -97,7 +97,7 @@ public class SPLL2 {
 
             // Normalise distribution to 0..1
             for(int k = 0; k < w1Clusters.size(); k++) {
-                distributionW2[k] /= quantizer.getW2().size();
+                distributionW2[k] /= quantizer.getHead().size();
             }
 
             return clusterToExampleDistances;

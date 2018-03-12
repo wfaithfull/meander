@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.util.FastMath;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.WindowPairClusteringQuantizer;
+import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.streams.StreamContext;
 
@@ -60,7 +60,7 @@ public class KL  {
         }
 
         public boolean ready() {
-            return quantizer.getW1().isAtFullCapacity();
+            return quantizer.getTail().isAtFullCapacity();
         }
 
         public KLState execute(Double[] value, StreamContext context) {
