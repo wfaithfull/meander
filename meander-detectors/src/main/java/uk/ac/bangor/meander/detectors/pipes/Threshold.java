@@ -4,8 +4,6 @@ import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * @author Will Faithfull
@@ -74,6 +72,11 @@ public class Threshold<T> implements Pipe<T, Boolean> {
         return new Threshold(Op.LEQ, threshold, Pipe.identity());
     }
 
+    /**
+     * A threshold is a special case for reporting. It may generate another dynamic double valued statistic
+     * which we want to report, but the pipe maps from T -> Boolean, so under normal circumstances we wouldn't be able
+     * to see it. This allows us to attach a reporter to consume the threshold value as well for plotting.
+     */
     public Threshold<T> report(TriConsumer<Double, Pipe, StreamContext> consumer) {
         this.consumer = consumer;
         return this;
