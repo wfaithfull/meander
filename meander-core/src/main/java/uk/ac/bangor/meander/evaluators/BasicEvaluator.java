@@ -1,9 +1,7 @@
 package uk.ac.bangor.meander.evaluators;
 
 import lombok.extern.java.Log;
-import uk.ac.bangor.meander.detectors.Detector;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.streams.Example;
 import uk.ac.bangor.meander.streams.StreamContext;
 import uk.ac.bangor.meander.transitions.Transition;
@@ -52,7 +50,13 @@ public class BasicEvaluator extends AbstractEvaluator {
             }
 
             long index = ctx.getIndex();
-            boolean detection = detector.execute(example.getData(), ctx);
+
+            boolean detection = false;
+            try {
+                detection = detector.execute(example.getData(), ctx);
+            } catch (Pipe.NotReadyException notReady) {
+                // Shrug. We just have to continue.
+            }
 
             if(ctx.isChanging()) {
                 transition = ctx.getCurrentTransition().get();

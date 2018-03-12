@@ -13,11 +13,13 @@ public interface Pipe<I, O> {
 
     default <R> Pipe<I, R> then(Pipe<O, R> source) {
         return (value, ctx) -> {
-            if(!source.ready()) {
+            O output = execute(value, ctx);
+
+            if(!ready()) {
+                throw new NotReadyException(this);
+            } else if(!source.ready()) {
                 throw new NotReadyException(source);
             }
-
-            O output = execute(value, ctx);
 
             return source.execute(output, ctx);
         };
@@ -25,11 +27,13 @@ public interface Pipe<I, O> {
 
     default <R> Pipe<I, R> then(Pipe<O, R> source, TriConsumer<R,Pipe<O,R>,StreamContext> fork) {
         return (value, ctx) -> {
-            if(!source.ready()) {
+            O output = execute(value, ctx);
+
+            if(!ready()) {
+                throw new NotReadyException(this);
+            } else if(!source.ready()) {
                 throw new NotReadyException(source);
             }
-
-            O output = execute(value, ctx);
 
             R then = source.execute(output, ctx);
             fork.accept(then, source, ctx);
