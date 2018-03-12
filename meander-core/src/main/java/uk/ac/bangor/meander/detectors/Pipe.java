@@ -2,8 +2,6 @@ package uk.ac.bangor.meander.detectors;
 
 import uk.ac.bangor.meander.streams.StreamContext;
 
-import java.util.function.Consumer;
-
 /**
  * Created by wfaithfull on 11/03/18.
  */
