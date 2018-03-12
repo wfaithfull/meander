@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 /**
  * @author Will Faithfull
  */
-public class WindowPairClusteringQuantizer implements Pipe<Double[], DistributionPair> {
+public class WindowPairClusteringQuantizer implements Pipe<Double[], ClusteringPair> {
 
     private WindowPair<double[]>     windowPair;
     private @Getter ClusteringWindow tail, head;
@@ -42,9 +42,9 @@ public class WindowPairClusteringQuantizer implements Pipe<Double[], Distributio
     }
 
     @Override
-    public DistributionPair execute(Double[] value, StreamContext context) {
+    public ClusteringPair execute(Double[] value, StreamContext context) {
         update(value);
-        return new DistributionPair(getP(), getQ());
+        return new ClusteringPair(tail.getClusterer(), head.getClusterer());
     }
 
     @Override
