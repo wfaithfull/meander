@@ -44,7 +44,7 @@ public class WindowPairClusteringQuantizer implements Pipe<Double[], ClusteringP
     @Override
     public ClusteringPair execute(Double[] value, StreamContext context) {
         update(value);
-        return new ClusteringPair(tail.getClusterer(), head.getClusterer());
+        return new ClusteringPair(value, tail.getClusterer(), head.getClusterer());
     }
 
     @Override

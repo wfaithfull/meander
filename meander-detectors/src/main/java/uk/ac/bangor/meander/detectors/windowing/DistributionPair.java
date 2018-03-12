@@ -8,5 +8,6 @@ import lombok.Getter;
  */
 @Getter @AllArgsConstructor
 public class DistributionPair {
+    Double[] last;
     double[] p, q;
 }
