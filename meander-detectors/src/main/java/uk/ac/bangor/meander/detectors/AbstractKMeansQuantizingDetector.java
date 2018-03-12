@@ -17,6 +17,7 @@ import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import org.apache.commons.math3.random.RandomGeneratorFactory;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
+import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,7 @@
-package uk.ac.bangor.meander.detectors;
+package uk.ac.bangor.meander.detectors.windowing;
 
 import lombok.Getter;
+import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.clusterers.StreamClusterer;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindow;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
