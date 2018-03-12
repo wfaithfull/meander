@@ -48,18 +48,18 @@ public class ClusteringWindowTest {
     }
 
 
-    private void evenDistribution(int n, Window<double[]> window) {
+    private void evenDistribution(int n, Window<Double[]> window) {
 
         int clIdx = 0;
 
         for(int i=0;i<n;i++) {
 
             if(clIdx == 0) {
-                window.update(new double[] { 1.0, 0.0, 0.0 });
+                window.update(new Double[] { 1.0, 0.0, 0.0 });
             } else if (clIdx == 1) {
-                window.update(new double[] { 0.0, 1.0, 0.0 });
+                window.update(new Double[] { 0.0, 1.0, 0.0 });
             } else {
-                window.update(new double[] { 0.0, 0.0, 1.0 });
+                window.update(new Double[] { 0.0, 0.0, 1.0 });
             }
 
             clIdx++;

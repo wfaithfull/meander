@@ -11,13 +11,13 @@ import uk.ac.bangor.meander.streams.StreamContext;
  */
 @AllArgsConstructor @Getter
 public class ClusteringPair {
-    Double[] last;
+    Window<Double[]> tail, head;
     Clustering p, q;
 
     public static class Distribution implements Pipe<ClusteringPair, DistributionPair> {
         @Override
         public DistributionPair execute(ClusteringPair value, StreamContext context) {
-            return new DistributionPair(value.getLast(), value.getP().getDistribution(), value.getQ().getDistribution());
+            return new DistributionPair(value.getP().getDistribution(), value.getQ().getDistribution());
         }
     }
 }

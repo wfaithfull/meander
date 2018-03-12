@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.util.FastMath;
 import uk.ac.bangor.meander.detectors.Pipe;
+import uk.ac.bangor.meander.detectors.windowing.ClusteringPair;
+import uk.ac.bangor.meander.detectors.windowing.DistributionPair;
 import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.streams.StreamContext;
@@ -25,16 +27,7 @@ public class KL  {
         private double[] q;
     }
 
-    public static class KLReduction implements Pipe<Double[], KLState> {
-
-        private int K;
-
-        private WindowPairClusteringQuantizer quantizer;
-
-        public KLReduction(int size, int K) {
-            quantizer = new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K));
-            this.K = K;
-        }
+    public static class KLReduction implements Pipe<DistributionPair, KLState> {
 
         private static double eps = 0.00001;
 
@@ -59,19 +52,15 @@ public class KL  {
             return divergence;
         }
 
-        public boolean ready() {
-            return quantizer.getTail().isAtFullCapacity();
-        }
-
-        public KLState execute(Double[] value, StreamContext context) {
-            quantizer.update(value);
-            double[] p = quantizer.getP();
-            double[] q = quantizer.getQ();
+        public KLState execute(DistributionPair value, StreamContext context) {
+            double[] p = value.getP();
+            double[] q = value.getQ();
+            int K = p.length;
 
             addEps(p);
             addEps(q);
 
-            double statistic = klDivergence(p, q);
+            double statistic = Math.abs(klDivergence(p, q));
 
             return new KLState(statistic, K, p, q);
         }
@@ -98,12 +87,16 @@ public class KL  {
     }
 
     public static Pipe<Double[], Boolean> detector(int size, int K) {
-        return new KLReduction(size, K)
+        return new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K))
+                .then(new ClusteringPair.Distribution())
+                .then(new KLReduction())
                 .then(new Threshold<>(Threshold.Op.GT, new LikelihoodRatioThreshold(), new KLStateStatistic()));
     }
 
     public static Pipe<Double[], Double> reduction(int size, int K) {
-        return new KLReduction(size, K)
+        return new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K))
+                .then(new ClusteringPair.Distribution())
+                .then(new KLReduction())
                 .then((value, context) -> value.getStatistic());
     }
 

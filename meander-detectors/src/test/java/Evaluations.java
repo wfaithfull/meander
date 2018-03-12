@@ -2,12 +2,15 @@ import lombok.extern.java.Log;
 import uk.ac.bangor.meander.detectors.JFreeChartReporter;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.ReportPipe;
+import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.controlchart.MR;
 import uk.ac.bangor.meander.detectors.ensemble.DecayingMajority;
 import uk.ac.bangor.meander.detectors.ensemble.LogisticDecayFunction;
 import uk.ac.bangor.meander.detectors.ensemble.SubspaceEnsemble;
 import uk.ac.bangor.meander.detectors.pipes.*;
+import uk.ac.bangor.meander.detectors.windowing.ClusteringPair;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
+import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 import uk.ac.bangor.meander.evaluators.BasicEvaluator;
 import uk.ac.bangor.meander.evaluators.Evaluation;
 import uk.ac.bangor.meander.evaluators.Evaluator;
@@ -15,6 +18,7 @@ import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.transitions.AbruptTransition;
 
 import java.io.IOException;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -41,17 +45,17 @@ public class Evaluations {
 
         Pipe<Double[], Boolean> detector = SPLL2.detector(W, 3);
 
-
-        Pipe kl = new KL.KLReduction(W, 3)
+        Pipe kl = new WindowPairClusteringQuantizer(W, () -> new KMeansStreamClusterer(3))
+                .then(new ClusteringPair.Distribution())
+                .then(new KL.KLReduction())
                 .then(new ReportPipe<>(reporter::statistic, KL.KLState::getStatistic))
                 .then(new Threshold<>(Threshold.Op.GT, new KL.LikelihoodRatioThreshold(), new KL.KLStateStatistic())
                 .report(reporter::ucl));
 
         Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MR.MRReduction().then(new MR.MRLimits());
-
-
         Pipe<Double[], Boolean> subspace = new SubspaceEnsemble(mrSupplier)
-                .then(new DecayingMajority(new LogisticDecayFunction()), reporter::statistic)
+                .then(new DecayingMajority(new LogisticDecayFunction()))
+                .then(new ReportPipe<>(reporter::statistic, Function.identity()))
                 .then(Threshold.greaterThan(.25).report(reporter::ucl));
 
         evaluate(subspace, arffStream);

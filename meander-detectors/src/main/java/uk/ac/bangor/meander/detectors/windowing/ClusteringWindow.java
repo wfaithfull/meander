@@ -13,25 +13,25 @@ import java.util.Queue;
 /**
  * @author Will Faithfull
  */
-public class ClusteringWindow extends FixedWindow<double[]> implements Pipe<Double[], Clustering> {
+public class ClusteringWindow extends FixedWindow<Double[]> implements Pipe<Double[], Clustering> {
 
     @Getter
     private final StreamClusterer clusterer;
     private       Queue<Integer>  assignments;
 
     public ClusteringWindow(int size, StreamClusterer clusterer) {
-        super(size, double[].class);
+        super(size, Double[].class);
         this.clusterer = clusterer;
         this.assignments = new LinkedList<>();
     }
 
     @Override
-    public void update(double[] observation) {
-        int cluster = clusterer.update(observation);
+    public void update(Double[] observation) {
+        int cluster = clusterer.update(CollectionUtils.unbox(observation));
         assignments.add(cluster);
 
         if(isAtFullCapacity()) {
-            clusterer.drop(assignments.remove(), getOldest());
+            clusterer.drop(assignments.remove(), CollectionUtils.unbox(getOldest()));
         }
 
         super.update(observation);
@@ -39,7 +39,7 @@ public class ClusteringWindow extends FixedWindow<double[]> implements Pipe<Doub
 
     @Override
     public Clustering execute(Double[] value, StreamContext context) {
-        update(CollectionUtils.unbox(value));
+        update(value);
         return clusterer;
     }
 
