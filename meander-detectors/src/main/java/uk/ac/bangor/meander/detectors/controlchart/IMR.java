@@ -7,7 +7,7 @@ import uk.ac.bangor.meander.streams.StreamContext;
  *
  * @author Will Faithfull
  */
-public class IMR extends MR.MRLimits {
+public class IMR extends MR.MRThreshold {
 
     @Override
     public Boolean execute(MR.MRState value, StreamContext context) {
