@@ -8,9 +8,11 @@ import uk.ac.bangor.meander.detectors.ensemble.DecayingMajority;
 import uk.ac.bangor.meander.detectors.ensemble.LogisticDecayFunction;
 import uk.ac.bangor.meander.detectors.ensemble.SubspaceEnsemble;
 import uk.ac.bangor.meander.detectors.pipes.*;
+import uk.ac.bangor.meander.detectors.preprocessors.WindowPairPCATransform;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringPair;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
+import uk.ac.bangor.meander.detectors.windowing.WindowPairPipe;
 import uk.ac.bangor.meander.evaluators.BasicEvaluator;
 import uk.ac.bangor.meander.evaluators.Evaluation;
 import uk.ac.bangor.meander.evaluators.Evaluator;
@@ -41,7 +43,7 @@ public class Evaluations {
         JFreeChartReporter reporter = new JFreeChartReporter("Subspace");
         Pipe<Double[], Boolean> spll = new SPLL(new WindowPair<double[]>(W, W, double[].class),5)
                 .then(new CDF.ChiSquared(), reporter::statistic)
-                .then(Threshold.lessThan(0.05).report(reporter::lcl));
+                .then(Threshold.lessThan(0.05).reportThreshold(reporter::lcl));
 
         Pipe<Double[], Boolean> detector = SPLL2.detector(W, 3);
 
@@ -50,15 +52,32 @@ public class Evaluations {
                 .then(new KL.KLReduction())
                 .then(new ReportPipe<>(reporter::statistic, KL.KLState::getStatistic))
                 .then(new Threshold<>(Threshold.Op.GT, new KL.LikelihoodRatioThreshold(), new KL.KLStateStatistic())
-                .report(reporter::ucl));
+                        .reportThreshold(reporter::ucl));
 
-        Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MR.MRReduction().then(new MR.MRLimits());
+        Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MR.MRReduction().then(new MR.MRThreshold());
         Pipe<Double[], Boolean> subspace = new SubspaceEnsemble(mrSupplier)
                 .then(new DecayingMajority(new LogisticDecayFunction()))
                 .then(new ReportPipe<>(reporter::statistic, Function.identity()))
-                .then(Threshold.greaterThan(.25).report(reporter::ucl));
+                .then(Threshold.greaterThan(.25).reportThreshold(reporter::ucl));
 
-        evaluate(subspace, arffStream);
+        Pipe<Double[], Boolean> hotelling = new WindowPairPipe(100)
+                .then(new WindowPairPCATransform())
+                .then(new Hotelling.TsqReduction())
+                .then(new CDF.FWithDF().then(new CDF.Inverse()))
+                .then(Threshold.lessThan(0.05));
+
+        evaluate(new WindowPairPipe(100)
+                .then(new WindowPairPCATransform())
+                .then(new Hotelling.TsqReduction())
+                .then(new CDF.FWithDF().then(new CDF.Inverse()))
+                // Threshold inverts the cumulative probability
+                .then(Threshold.lessThan(0.05)
+                        .report(reporter::lcl, reporter::statistic))
+                .then(new ResetOnChangeDetected()), arffStream);
+        /*evaluate(new SubspaceEnsemble(() -> Detectors.Univariate.movingRangeChart())
+                .then(new DecayingMajority(new LinearDecayFunction(50)))
+                .then(Threshold.greaterThan(.25).report(reporter::ucl, reporter::statistic))
+                .then(new ResetOnChangeDetected()), arffStream);*/
     }
 
     private static void evaluate(Pipe<Double[],Boolean> detector, ChangeStreamBuilder arffStream) {
@@ -67,7 +86,5 @@ public class Evaluations {
         Evaluation evaluation = evaluator.evaluate(detector, arffStream, 10000, 1);
         log.info(evaluation.toString());
     }
-
-
 
 }
