@@ -56,4 +56,21 @@ public class SubspaceEnsemble implements Pipe<Double[], Boolean[]> {
 
         return votes;
     }
+
+    @Override
+    public void reset() {
+        if (detectors == null) {
+            return;
+        }
+        for (Pipe pipe : detectors) {
+            if (pipe.needReset()) {
+                pipe.reset();
+            }
+        }
+    }
+
+    @Override
+    public boolean needReset() {
+        return true;
+    }
 }

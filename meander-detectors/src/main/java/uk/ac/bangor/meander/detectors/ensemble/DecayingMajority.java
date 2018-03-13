@@ -44,4 +44,19 @@ public class DecayingMajority implements Pipe<Boolean[], Double> {
 
         return (total / (double)value.length);
     }
+
+    @Override
+    public void reset() {
+        if (votes == null) {
+            return;
+        }
+        for (int i = 0; i < votes.length; i++) {
+            votes[i] = 0;
+        }
+    }
+
+    @Override
+    public boolean needReset() {
+        return true;
+    }
 }

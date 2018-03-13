@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import uk.ac.bangor.meander.detectors.Pipe;
+import uk.ac.bangor.meander.detectors.pipes.Threshold;
 import uk.ac.bangor.meander.detectors.stats.IncrementalStatistics;
 import uk.ac.bangor.meander.streams.StreamContext;
 
@@ -45,6 +46,7 @@ public class MR {
             last = input;
         }
 
+        @Override
         public void reset() {
             last = 0;
             statistic = 0;
@@ -60,18 +62,19 @@ public class MR {
         }
     }
 
-    public static class MRLimits implements Pipe<MRState, Boolean> {
+    public static class MRThreshold extends Threshold<MRState> {
 
         protected final static double D4_2 = 3.267;
 
-        @Override
-        public Boolean execute(MRState value, StreamContext context) {
-            if(value.getStatistics().getN() < 2)
-                return false;
+        public MRThreshold() {
+            super(Op.GT, MRThreshold::limit, (mr, ctx) -> mr.getStatistic());
+        }
 
-            boolean mrUCL = value.getStatistic() > D4_2 * value.getCenter();
+        private static Double limit(MRState mr, StreamContext ctx) {
+            if (mr.getStatistics().getN() < 2)
+                return Double.POSITIVE_INFINITY;
 
-            return mrUCL;
+            return D4_2 * mr.getCenter();
         }
     }
 
@@ -79,7 +82,7 @@ public class MR {
         final MRReduction reduction = new MRReduction();
 
         return reduction
-                .then(new MRLimits())
+                .then(new MRThreshold())
                 .then((value, context) -> {
                     if(resetOnChangeDetected && value) {
                         reduction.reset();
