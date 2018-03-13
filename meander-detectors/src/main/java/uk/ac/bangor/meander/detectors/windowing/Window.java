@@ -57,4 +57,6 @@ public interface Window<T> {
      */
     int capacity();
 
+    void clear();
+
 }

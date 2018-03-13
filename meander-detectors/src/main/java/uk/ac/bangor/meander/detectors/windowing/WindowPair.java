@@ -81,4 +81,10 @@ public class WindowPair<T> implements Window<T> {
         return window1.capacity()+window2.capacity();
     }
 
+    @Override
+    public void clear() {
+        window1.clear();
+        window2.clear();
+    }
+
 }
