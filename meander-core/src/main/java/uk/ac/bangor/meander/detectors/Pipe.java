@@ -11,6 +11,11 @@ public interface Pipe<I, O> {
 
     default <R> Pipe<I, R> then(Pipe<O, R> source) {
         return (value, ctx) -> {
+            if (ctx.detectorsNeedReset()) {
+                reset();
+                source.reset();
+            }
+
             O output = execute(value, ctx);
 
             if(!ready()) {
@@ -25,6 +30,10 @@ public interface Pipe<I, O> {
 
     default <R> Pipe<I, R> then(Pipe<O, R> source, TriConsumer<R,Pipe<O,R>,StreamContext> fork) {
         return (value, ctx) -> {
+            if (ctx.detectorsNeedReset()) {
+                reset();
+                source.reset();
+            }
             O output = execute(value, ctx);
 
             if(!ready()) {
@@ -37,6 +46,13 @@ public interface Pipe<I, O> {
             fork.accept(then, source, ctx);
             return then;
         };
+    }
+
+    default void reset() {
+    }
+
+    default boolean needReset() {
+        return false;
     }
 
     @FunctionalInterface

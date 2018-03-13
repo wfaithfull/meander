@@ -5,7 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import uk.ac.bangor.meander.transitions.Transition;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Will Faithfull
@@ -14,16 +17,18 @@ import java.util.*;
  */
 public class StreamContext {
 
-    @Getter private                                      long             index;
-    @Getter @Setter                                      int              sequence;
-    @Getter @Setter                                      int              label;
-    @Getter @Setter                                      List<Transition> transitions;
-    private                                              Transition       mostRecent;
-    @Getter @Setter(AccessLevel.PACKAGE) private         double[]         sourcePriors;
-    private                                              List<double[]>  classPriors;
-    @Getter private                                      int dimensionality;
-    @Getter @Setter(AccessLevel.PACKAGE) private         boolean finished;
-    @Getter @Setter private                              Integer[] changeLabels;
+    @Getter private                              long             index;
+    @Getter @Setter                              int              sequence;
+    @Getter @Setter                              int              label;
+    @Getter @Setter                              List<Transition> transitions;
+    private                                      Transition       mostRecent;
+    @Getter @Setter(AccessLevel.PACKAGE) private double[]         sourcePriors;
+    private                                      List<double[]>   classPriors;
+    @Getter private                              int              dimensionality;
+    @Getter @Setter(AccessLevel.PACKAGE) private boolean          finished;
+    @Getter @Setter private                      Integer[]        changeLabels;
+    @Getter
+    private                                      long             lastDetection;
 
     StreamContext() {
         index = 0;
@@ -79,6 +84,14 @@ public class StreamContext {
     void transition(Transition transition) {
         transitions.add(transition);
         mostRecent = transition;
+    }
+
+    public void detection() {
+        lastDetection = index;
+    }
+
+    public boolean detectorsNeedReset() {
+        return lastDetection == index - 1;
     }
 
     void setClassPriors(double[] classPriors) {
