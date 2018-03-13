@@ -25,8 +25,10 @@ public class SPLL extends AbstractKMeansQuantizingDetector implements Pipe<Doubl
         super.update(value);
 
         double[] distances = getMinClusterToObservationDistances();
-        if(distances == null)
-            return 0d;
+
+        if (distances == null) {
+            throw new NotReadyException(this);
+        }
 
         double likelihoodTerm = 0;
         for(int i=0;i<distances.length;i++) {
@@ -36,8 +38,18 @@ public class SPLL extends AbstractKMeansQuantizingDetector implements Pipe<Doubl
     }
 
     @Override
-    public boolean ready() {
+    public boolean needReset() {
         return true;
+    }
+
+    @Override
+    public void reset() {
+        super.windowPair.clear();
+    }
+
+    @Override
+    public boolean ready() {
+        return windowPair.size() == windowPair.capacity();
     }
 
 }
