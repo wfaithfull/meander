@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.util.FastMath;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.windowing.ClusteringPair;
 import uk.ac.bangor.meander.detectors.windowing.DistributionPair;
-import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
-import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -47,7 +44,7 @@ public class KL  {
                 if (p1[i] == 0d || p2[i] == 0d)
                     continue;
 
-                divergence += p1[i] * FastMath.log(p2[i] / p1[i]);
+                divergence += p1[i] * FastMath.log(p1[i] / p2[i]);
             }
             return divergence;
         }
@@ -84,20 +81,6 @@ public class KL  {
         public Double execute(KLState value, StreamContext context) {
             return value.getStatistic();
         }
-    }
-
-    public static Pipe<Double[], Boolean> detector(int size, int K) {
-        return new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K))
-                .then(new ClusteringPair.Distribution())
-                .then(new KLReduction())
-                .then(new Threshold<>(Threshold.Op.GT, new LikelihoodRatioThreshold(), new KLStateStatistic()));
-    }
-
-    public static Pipe<Double[], Double> reduction(int size, int K) {
-        return new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K))
-                .then(new ClusteringPair.Distribution())
-                .then(new KLReduction())
-                .then((value, context) -> value.getStatistic());
     }
 
 }
