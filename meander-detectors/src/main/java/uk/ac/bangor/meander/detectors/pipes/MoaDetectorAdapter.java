@@ -90,4 +90,14 @@ public class MoaDetectorAdapter implements Pipe<Double, Boolean> {
         moaDetector.input(value);
         return moaDetector.getChange();
     }
+
+    @Override
+    public void reset() {
+        moaDetector.resetLearning();
+    }
+
+    @Override
+    public boolean needReset() {
+        return true;
+    }
 }
