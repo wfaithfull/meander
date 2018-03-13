@@ -10,11 +10,12 @@ import java.util.function.BiFunction;
  */
 public class Threshold<T> implements Pipe<T, Boolean> {
 
-    private final Op op;
-    private final BiFunction<Double, Double, Boolean> fn;
-    private final Pipe<T, Double> threshold;
-    private final Pipe<T, Double> doubleMapper;
-    private TriConsumer<Double, Pipe, StreamContext> consumer;
+    private final Op                                       op;
+    private final BiFunction<Double, Double, Boolean>      fn;
+    private final Pipe<T, Double>                          threshold;
+    private final Pipe<T, Double>                          doubleMapper;
+    private       TriConsumer<Double, Pipe, StreamContext> thresholdConsumer;
+    private       TriConsumer<Double, Pipe, StreamContext> statisticConsumer;
 
     public enum Op {
         GT,
@@ -50,10 +51,14 @@ public class Threshold<T> implements Pipe<T, Boolean> {
     @Override
     public Boolean execute(T value, StreamContext context) {
         double threshold = this.threshold.execute(value, context);
-        if(consumer != null) {
-            consumer.accept(threshold, this, context);
+        double statistic = this.doubleMapper.execute(value, context);
+        if (thresholdConsumer != null) {
+            thresholdConsumer.accept(threshold, this, context);
         }
-        return this.fn.apply(doubleMapper.execute(value, context), threshold);
+        if (statisticConsumer != null) {
+            statisticConsumer.accept(statistic, this, context);
+        }
+        return this.fn.apply(statistic, threshold);
     }
 
     public static Threshold<Double> greaterThan(double threshold) {
@@ -74,11 +79,23 @@ public class Threshold<T> implements Pipe<T, Boolean> {
 
     /**
      * A threshold is a special case for reporting. It may generate another dynamic double valued statistic
-     * which we want to report, but the pipe maps from T -> Boolean, so under normal circumstances we wouldn't be able
+     * which we want to reportThreshold, but the pipe maps from T -> Boolean, so under normal circumstances we wouldn't be able
      * to see it. This allows us to attach a reporter to consume the threshold value as well for plotting.
      */
-    public Threshold<T> report(TriConsumer<Double, Pipe, StreamContext> consumer) {
-        this.consumer = consumer;
+    public Threshold<T> reportThreshold(TriConsumer<Double, Pipe, StreamContext> consumer) {
+        this.thresholdConsumer = consumer;
+        return this;
+    }
+
+    public Threshold<T> reportStatistic(TriConsumer<Double, Pipe, StreamContext> consumer) {
+        this.thresholdConsumer = consumer;
+        return this;
+    }
+
+    public Threshold<T> report(TriConsumer<Double, Pipe, StreamContext> thresholdConsumer,
+                               TriConsumer<Double, Pipe, StreamContext> statisticConsumer) {
+        this.thresholdConsumer = thresholdConsumer;
+        this.statisticConsumer = statisticConsumer;
         return this;
     }
 }
