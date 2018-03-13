@@ -1,7 +1,6 @@
 package uk.ac.bangor.meander.detectors.windowing;
 
 import lombok.Getter;
-import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.clusterers.StreamClusterer;
 import uk.ac.bangor.meander.streams.StreamContext;
@@ -13,17 +12,18 @@ import java.util.function.Supplier;
  */
 public class WindowPairClusteringQuantizer implements Pipe<Double[], ClusteringPair> {
 
-    private WindowPair<Double[]>     windowPair;
-    private @Getter ClusteringWindow tail, head;
+    private final  int                       size;
+    private final  Supplier<StreamClusterer> clustererSupplier;
+    private        WindowPair<Double[]>      windowPair;
+    private @GetterClusteringWindow          tail, head;
 
     double[] p;
     double[] q;
 
     public WindowPairClusteringQuantizer(int size, Supplier<StreamClusterer> clustererSupplier) {
-        tail = new ClusteringWindow(size, clustererSupplier.get());
-        head = new ClusteringWindow(size, clustererSupplier.get());
-
-        windowPair = new WindowPair<>(tail, head);
+        this.size = size;
+        this.clustererSupplier = clustererSupplier;
+        reset();
     }
 
     public void update(Double[] input) {
@@ -39,6 +39,19 @@ public class WindowPairClusteringQuantizer implements Pipe<Double[], ClusteringP
 
     public double[] getQ() {
         return q;
+    }
+
+    @Override
+    public boolean needReset() {
+        return true;
+    }
+
+    @Override
+    public void reset() {
+        tail = new ClusteringWindow(size, clustererSupplier.get());
+        head = new ClusteringWindow(size, clustererSupplier.get());
+
+        windowPair = new WindowPair<>(tail, head);
     }
 
     @Override
