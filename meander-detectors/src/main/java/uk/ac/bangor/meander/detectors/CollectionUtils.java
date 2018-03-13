@@ -56,7 +56,6 @@ public class CollectionUtils {
     public static double[][] subtractColMeans(double[][] input) {
         double[] colMeans = colMean(input);
         for(int column=0;column<input[0].length;column++) {
-            double colTotal = 0;
             for(int row=0;row<input.length;row++) {
                 input[row][column] = input[row][column] - colMeans[column];
             }
@@ -76,9 +75,9 @@ public class CollectionUtils {
         Arrays.sort(array);
         double median;
         if (array.length % 2 == 0)
-            median = ((double)array[array.length/2] + (double)array[array.length/2 - 1])/2;
+            median = (array[array.length / 2] + array[array.length / 2 - 1]) / 2;
         else
-            median = (double) array[array.length/2];
+            median = array[array.length / 2];
         return median;
     }
 
@@ -132,6 +131,26 @@ public class CollectionUtils {
         Double[] boxed = new Double[input.length];
         for(int i=0;i<input.length;i++) {
             boxed[i] = input[i];
+        }
+        return boxed;
+    }
+
+    public static double[][] unbox(Double[][] input) {
+        double[][] unboxed = new double[input.length][input[0].length];
+        for (int i = 0; i < input.length; i++) {
+            for (int j = 0; j < input[0].length; j++) {
+                unboxed[i][j] = input[i][j];
+            }
+        }
+        return unboxed;
+    }
+
+    public static Double[][] box(double[][] input) {
+        Double[][] boxed = new Double[input.length][input[0].length];
+        for (int i = 0; i < input.length; i++) {
+            for (int j = 0; j < input[0].length; j++) {
+                boxed[i][j] = input[i][j];
+            }
         }
         return boxed;
     }
