@@ -24,7 +24,7 @@ public class PCA {
      *
      * @author Will Faithfull
      */
-    public static class WindowPairPCATransform implements Pipe<WindowPair<Double[]>, WindowPair<Double[]>> {
+    public static class WindowPairTransform implements Pipe<WindowPair<Double[]>, WindowPair<Double[]>> {
 
         FixedWindow<Double[]> w1;
         FixedWindow<Double[]> w2;
@@ -49,7 +49,7 @@ public class PCA {
         }
 
         public static Pipe<Double[], WindowPair<Double[]>> fromDouble(int size) {
-            return new WindowPairPipe(size).then(new WindowPairPCATransform());
+            return new WindowPairPipe(size).then(new WindowPairTransform());
         }
 
     }

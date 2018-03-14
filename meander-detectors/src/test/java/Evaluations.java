@@ -61,13 +61,13 @@ public class Evaluations {
                 .then(Threshold.greaterThan(.25).reportThreshold(reporter::ucl));
 
         Pipe<Double[], Boolean> hotelling = new WindowPairPipe(100)
-                .then(new PCA.WindowPairPCATransform())
+                .then(new PCA.WindowPairTransform())
                 .then(new Hotelling.TsqReduction())
                 .then(new CDF.FWithDF().then(new CDF.Inverse()))
                 .then(Threshold.lessThan(0.05));
 
         evaluate(new WindowPairPipe(100)
-                .then(new PCA.WindowPairPCATransform())
+                .then(new PCA.WindowPairTransform())
                 .then(new Hotelling.TsqReduction())
                 .then(new CDF.FWithDF().then(new CDF.Inverse()))
                 // Threshold inverts the cumulative probability
