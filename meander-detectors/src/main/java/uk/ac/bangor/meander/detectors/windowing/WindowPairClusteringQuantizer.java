@@ -12,13 +12,13 @@ import java.util.function.Supplier;
  */
 public class WindowPairClusteringQuantizer implements Pipe<Double[], ClusteringPair> {
 
-    private final  int                       size;
-    private final  Supplier<StreamClusterer> clustererSupplier;
-    private        WindowPair<Double[]>      windowPair;
-    private @GetterClusteringWindow          tail, head;
-
+    private final int                       size;
+    private final Supplier<StreamClusterer> clustererSupplier;
     double[] p;
     double[] q;
+    private WindowPair<Double[]> windowPair;
+    @Getter
+    private ClusteringWindow     tail, head;
 
     public WindowPairClusteringQuantizer(int size, Supplier<StreamClusterer> clustererSupplier) {
         this.size = size;
