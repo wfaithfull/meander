@@ -8,7 +8,7 @@ import uk.ac.bangor.meander.detectors.ensemble.DecayingMajority;
 import uk.ac.bangor.meander.detectors.ensemble.LogisticDecayFunction;
 import uk.ac.bangor.meander.detectors.ensemble.SubspaceEnsemble;
 import uk.ac.bangor.meander.detectors.pipes.*;
-import uk.ac.bangor.meander.detectors.preprocessors.WindowPairPCATransform;
+import uk.ac.bangor.meander.detectors.preprocessors.PCA;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringPair;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
@@ -61,13 +61,13 @@ public class Evaluations {
                 .then(Threshold.greaterThan(.25).reportThreshold(reporter::ucl));
 
         Pipe<Double[], Boolean> hotelling = new WindowPairPipe(100)
-                .then(new WindowPairPCATransform())
+                .then(new PCA.WindowPairPCATransform())
                 .then(new Hotelling.TsqReduction())
                 .then(new CDF.FWithDF().then(new CDF.Inverse()))
                 .then(Threshold.lessThan(0.05));
 
         evaluate(new WindowPairPipe(100)
-                .then(new WindowPairPCATransform())
+                .then(new PCA.WindowPairPCATransform())
                 .then(new Hotelling.TsqReduction())
                 .then(new CDF.FWithDF().then(new CDF.Inverse()))
                 // Threshold inverts the cumulative probability

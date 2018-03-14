@@ -15,17 +15,15 @@ import java.util.Arrays;
  *
  * @author Will Faithfull
  */
-public class PCA {
+public class PrincipalComponents {
 
     private Matrix data;
-    private
     @Getter
-            Matrix eigenvalues;
-    private
+    private Matrix eigenvalues;
     @Getter
-            Matrix coeff;
+    private Matrix coeff;
 
-    public PCA(Matrix data) {
+    public PrincipalComponents(Matrix data) {
         this.data = data;
         data = new Matrix(CollectionUtils.subtractColMeans(data.getArray()));
         Matrix covariance = new MeanAndCovariance(data).getCovariance();
@@ -36,20 +34,12 @@ public class PCA {
         this.eigenvalues = createDiagonal(permutation.getValues());
     }
 
-    public PCA(double[][] data) {
+    public PrincipalComponents(double[][] data) {
         this(new Matrix(data));
     }
 
-    public PCA(Double[][] data) {
+    public PrincipalComponents(Double[][] data) {
         this(CollectionUtils.unbox(data));
-    }
-
-    public Matrix getScores() {
-        return transform(data);
-    }
-
-    public Matrix transform(Matrix data) {
-        return data.times(coeff);
     }
 
     private static double[] diag(Matrix m) {
@@ -91,6 +81,14 @@ public class PCA {
             }
         }
         return permuted;
+    }
+
+    public Matrix getScores() {
+        return transform(data);
+    }
+
+    public Matrix transform(Matrix data) {
+        return data.times(coeff);
     }
 
     @AllArgsConstructor

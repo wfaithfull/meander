@@ -3,7 +3,7 @@ package uk.ac.bangor.meander.detectors.preprocessors;
 import Jama.Matrix;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.bangor.meander.detectors.stats.PCA;
+import uk.ac.bangor.meander.detectors.stats.PrincipalComponents;
 
 /**
  * @author Will Faithfull
@@ -34,9 +34,9 @@ public class PCATest {
 
     @Test
     public void testPCA() {
-        PCA pca = new PCA(new Matrix(DATA));
+        PrincipalComponents principalComponents = new PrincipalComponents(new Matrix(DATA));
 
-        Matrix coeff = pca.getCoeff();
+        Matrix coeff = principalComponents.getCoeff();
 
         // Our coefficients should match those computed by MATLAB assuming we've done our job.
         for (int i = 0; i < coeff.getRowDimension(); i++) {
