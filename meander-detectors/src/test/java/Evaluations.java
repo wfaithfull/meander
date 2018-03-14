@@ -13,9 +13,9 @@ import uk.ac.bangor.meander.detectors.windowing.ClusteringPair;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 import uk.ac.bangor.meander.detectors.windowing.WindowPairPipe;
-import uk.ac.bangor.meander.evaluators.BasicEvaluator;
 import uk.ac.bangor.meander.evaluators.Evaluation;
 import uk.ac.bangor.meander.evaluators.Evaluator;
+import uk.ac.bangor.meander.evaluators.SequenceEvaluator;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.transitions.AbruptTransition;
 import uk.ac.bangor.meander.transitions.LogisticTransition;
@@ -83,7 +83,7 @@ public class Evaluations {
 
     private static void evaluate(Pipe<Double[],Boolean> detector, ChangeStreamBuilder arffStream) {
 
-        Evaluator evaluator = new BasicEvaluator();
+        Evaluator evaluator = new SequenceEvaluator();
         Evaluation evaluation = evaluator.evaluate(detector, arffStream, 10000, 1);
         log.info(evaluation.toString());
     }

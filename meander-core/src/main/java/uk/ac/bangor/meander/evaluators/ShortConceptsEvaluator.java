@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  *        t  t                                          t  t
  *
  * Our objective may be to detect these short sequences, rather than the to and from transition points. Under a normal
- * evaluation as in {@link BasicEvaluator}, the detectors would only have two observations to make a detection before
+ * evaluation as in {@link SequenceEvaluator}, the detectors would only have two observations to make a detection before
  * it is recorded as a false positive. In this interpretation, we are much more flexible, only interpreting transitions
  * from 0->1 as change points, not transitions from 1->0.
  *

@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  *      Missed Detection Ratio  (MDR)
  */
 @Log
-public class BasicEvaluator extends AbstractEvaluator {
+public class SequenceEvaluator extends AbstractEvaluator {
 
     private static final long MAX_N = 3000000000L;
 
