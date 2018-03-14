@@ -18,6 +18,7 @@ import uk.ac.bangor.meander.evaluators.Evaluation;
 import uk.ac.bangor.meander.evaluators.Evaluator;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.transitions.AbruptTransition;
+import uk.ac.bangor.meander.transitions.LogisticTransition;
 
 import java.io.IOException;
 import java.util.function.Function;
@@ -33,10 +34,10 @@ public class Evaluations {
 
         ChangeStreamBuilder arffStream = ChangeStreamBuilder
                 .fromArff("abalone.arff")
-                .withUniformClassMixture().fromStart()
-                .withClassMixture(1.0, 0.0, 0.0).transition(new AbruptTransition(2500))
-                .withClassMixture(0.0, 1.0, 0.0).transition(new AbruptTransition(5000))
-                .withClassMixture(0.0, 0.0, 1.0).transition(new AbruptTransition(7500));
+                .withUniformPriors().fromStart()
+                .withPriors(1.0, 0.0, 0.0).transition(new AbruptTransition(2500))
+                .withPriors(0.0, 1.0, 0.0).transition(new LogisticTransition(5000, 5100))
+                .withPriors(0.0, 0.0, 1.0).transition(new AbruptTransition(7500));
 
         int W = 25;
 

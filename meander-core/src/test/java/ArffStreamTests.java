@@ -22,7 +22,7 @@ public class ArffStreamTests {
     public void testArffStream() throws IOException {
         Stream<Example> arffStream = ChangeStreamBuilder
                 .fromArff("abalone.arff")
-                .withUniformClassMixture().fromStart()
+                .withUniformPriors().fromStart()
                 .build();
 
         int n = 100;
@@ -40,8 +40,8 @@ public class ArffStreamTests {
     public void testAbruptTransition() throws IOException {
         Stream<Example> arffStream = ChangeStreamBuilder
                 .fromArff("abalone.arff")
-                .withUniformClassMixture().fromStart()
-                .withClassMixture(1.0, 0.0, 0.0).transition(new AbruptTransition(50))
+                .withUniformPriors().fromStart()
+                .withPriors(1.0, 0.0, 0.0).transition(new AbruptTransition(50))
                 .build();
 
         int n = 100;
@@ -83,8 +83,8 @@ public class ArffStreamTests {
         
         Stream<Example> arffStream = ChangeStreamBuilder
                 .fromArff("abalone.arff")
-                .withUniformClassMixture().fromStart()
-                .withClassMixture(1.0, 0.0, 0.0).transition(new LinearTransition(C, C + L))
+                .withUniformPriors().fromStart()
+                .withPriors(1.0, 0.0, 0.0).transition(new LinearTransition(C, C + L))
                 .build();
 
         int n = 100;
@@ -114,8 +114,8 @@ public class ArffStreamTests {
 
         Stream<Example> arffStream = ChangeStreamBuilder
                 .fromArff("abalone.arff")
-                .withUniformClassMixture().fromStart()
-                .withClassMixture(1.0, 0.0, 0.0).transition(new LogisticTransition(C, C + L))
+                .withUniformPriors().fromStart()
+                .withPriors(1.0, 0.0, 0.0).transition(new LogisticTransition(C, C + L))
                 .build();
 
         int n = 100;
@@ -145,10 +145,10 @@ public class ArffStreamTests {
 
         Stream<Example> arffStream = ChangeStreamBuilder
                 .fromArff("abalone.arff")
-                .withUniformClassMixture().fromStart()
-                .withClassMixture(1.0, 0.0, 0.0).transition(new LogisticTransition(C, C + L))
-                .withClassMixture(0.0, 1.0, 0.0).transition(new LinearTransition(C*2, (C*2)+L))
-                .withClassMixture(0.0, 0.0, 1.0).transition(new AbruptTransition(C*3))
+                .withUniformPriors().fromStart()
+                .withPriors(1.0, 0.0, 0.0).transition(new LogisticTransition(C, C + L))
+                .withPriors(0.0, 1.0, 0.0).transition(new LinearTransition(C * 2, (C * 2) + L))
+                .withPriors(0.0, 0.0, 1.0).transition(new AbruptTransition(C * 3))
                 .build();
 
         int n = 300;
