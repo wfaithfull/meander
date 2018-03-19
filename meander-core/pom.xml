@@ -6,13 +6,7 @@
 
     <groupId>uk.ac.bangor</groupId>
     <artifactId>meander-core</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
-    <parent>
-        <groupId>uk.ac.bangor</groupId>
-        <artifactId>meander</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
+    <version>0.2.0-ALPHA</version>
 
     <build>
         <plugins>
@@ -23,6 +17,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+                <version>3.7.0</version>
             </plugin>
         </plugins>
     </build>
