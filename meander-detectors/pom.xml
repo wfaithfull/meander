@@ -18,7 +18,7 @@
         <dependency>
             <groupId>uk.ac.bangor</groupId>
             <artifactId>meander-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.2.0-ALPHA</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -36,5 +36,18 @@
             <version>1.0.19</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
