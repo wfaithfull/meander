@@ -1,6 +1,7 @@
 package uk.ac.bangor.meander.detectors.windowing;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.lang.reflect.Array;
 
@@ -10,40 +11,41 @@ import java.lang.reflect.Array;
  * Represents a pair of sliding windows, with W1 holding the oldest observations, and W2 holding the newest.
  */
 @Getter
+@Setter
 public class WindowPair<T> implements Window<T> {
 
-    protected Window<T> window1;
-    protected Window<T> window2;
+    protected Window<T> tail;
+    protected Window<T> head;
 
     public WindowPair(int w1sz, int w2sz, Class<T> tClass) {
-        this.window1 = new FixedWindow<T>(w1sz, tClass);
-        this.window2 = new FixedWindow<T>(w2sz, tClass);
+        this.tail = new FixedWindow<T>(w1sz, tClass);
+        this.head = new FixedWindow<T>(w2sz, tClass);
     }
 
-    public WindowPair(Window<T> window1, Window<T> window2) {
-        this.window1 = window1;
-        this.window2 = window2;
+    public WindowPair(Window<T> tail, Window<T> head) {
+        this.tail = tail;
+        this.head = head;
     }
 
     @Override
     public T[] getElements() {
-        Class<?> componentType = window1.getElements().getClass().getComponentType();
+        Class<?> componentType = tail.getElements().getClass().getComponentType();
         @SuppressWarnings("unchecked")
-        T[] combined = (T[]) Array.newInstance(componentType, window1.size() + window2.size());
-        System.arraycopy(window1.getElements(), 0, combined, 0, window1.size());
-        System.arraycopy(window2.getElements(), 0, combined, window1.size(), window2.size());
+        T[] combined = (T[]) Array.newInstance(componentType, tail.size() + head.size());
+        System.arraycopy(tail.getElements(), 0, combined, 0, tail.size());
+        System.arraycopy(head.getElements(), 0, combined, tail.size(), head.size());
 
         return combined;
     }
 
     @Override
     public T getNewest() {
-        return window2.getNewest();
+        return head.getNewest();
     }
 
     @Override
     public T getOldest() {
-        return window1.getOldest();
+        return tail.getOldest();
     }
 
     /**
@@ -65,26 +67,26 @@ public class WindowPair<T> implements Window<T> {
      *          A new observation.
      */
     public void update(T observation) {
-        if(window2.size() == window2.capacity())
-            window1.update(window2.getOldest());
+        if (head.size() == head.capacity())
+            tail.update(head.getOldest());
 
-        window2.update(observation);
+        head.update(observation);
     }
 
     @Override
     public int size() {
-        return window1.size()+window2.size();
+        return tail.size() + head.size();
     }
 
     @Override
     public int capacity() {
-        return window1.capacity()+window2.capacity();
+        return tail.capacity() + head.capacity();
     }
 
     @Override
     public void clear() {
-        window1.clear();
-        window2.clear();
+        tail.clear();
+        head.clear();
     }
 
 }

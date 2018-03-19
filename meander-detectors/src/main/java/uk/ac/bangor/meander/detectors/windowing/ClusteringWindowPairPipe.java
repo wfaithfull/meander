@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 /**
  * @author Will Faithfull
  */
-public class WindowPairClusteringQuantizer implements Pipe<Double[], ClusteringPair> {
+public class ClusteringWindowPairPipe implements Pipe<Double[], ClusteringWindowPair> {
 
     private final int                       size;
     private final Supplier<StreamClusterer> clustererSupplier;
@@ -20,7 +20,7 @@ public class WindowPairClusteringQuantizer implements Pipe<Double[], ClusteringP
     @Getter
     private ClusteringWindow     tail, head;
 
-    public WindowPairClusteringQuantizer(int size, Supplier<StreamClusterer> clustererSupplier) {
+    public ClusteringWindowPairPipe(int size, Supplier<StreamClusterer> clustererSupplier) {
         this.size = size;
         this.clustererSupplier = clustererSupplier;
         reset();
@@ -55,9 +55,9 @@ public class WindowPairClusteringQuantizer implements Pipe<Double[], ClusteringP
     }
 
     @Override
-    public ClusteringPair execute(Double[] value, StreamContext context) {
+    public ClusteringWindowPair execute(Double[] value, StreamContext context) {
         update(value);
-        return new ClusteringPair(tail, head, tail.getClusterer(), head.getClusterer());
+        return new ClusteringWindowPair(tail, head, tail.getClusterer(), head.getClusterer());
     }
 
     @Override

@@ -9,9 +9,9 @@ import uk.ac.bangor.meander.detectors.ensemble.LogisticDecayFunction;
 import uk.ac.bangor.meander.detectors.ensemble.SubspaceEnsemble;
 import uk.ac.bangor.meander.detectors.pipes.*;
 import uk.ac.bangor.meander.detectors.preprocessors.PCA;
-import uk.ac.bangor.meander.detectors.windowing.ClusteringPair;
+import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPair;
+import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
-import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 import uk.ac.bangor.meander.detectors.windowing.WindowPairPipe;
 import uk.ac.bangor.meander.evaluators.Evaluation;
 import uk.ac.bangor.meander.evaluators.Evaluator;
@@ -48,8 +48,8 @@ public class Evaluations {
 
         Pipe<Double[], Boolean> detector = SPLL2.detector(W, 3);
 
-        Pipe kl = new WindowPairClusteringQuantizer(W, () -> new KMeansStreamClusterer(3))
-                .then(new ClusteringPair.Distribution())
+        Pipe kl = new ClusteringWindowPairPipe(W, () -> new KMeansStreamClusterer(3))
+                .then(new ClusteringWindowPair.Distribution())
                 .then(new KL.KLReduction())
                 .then(new ReportPipe<>(reporter::statistic, KL.KLState::getStatistic))
                 .then(new Threshold<>(Threshold.Op.GT, new KL.LikelihoodRatioThreshold(), new KL.KLStateStatistic())
@@ -67,10 +67,10 @@ public class Evaluations {
                 .then(new CDF.FWithDF().then(new CDF.Inverse()))
                 .then(Threshold.lessThan(0.05));
 
-        evaluate(new WindowPairPipe(100)
+        evaluate(new ClusteringWindowPairPipe(100, () -> new KMeansStreamClusterer(3))
                 .then(new PCA.WindowPairTransform())
-                .then(new Hotelling.TsqReduction())
-                .then(new CDF.FWithDF().then(new CDF.Inverse()))
+                .then(new SPLL2.SPLLReduction())
+                .then(new CDF.ChiSquared().then(new CDF.Inverse()))
                 // Threshold inverts the cumulative probability
                 .then(Threshold.lessThan(0.05)
                         .report(reporter::lcl, reporter::statistic))

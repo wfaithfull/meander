@@ -3,11 +3,10 @@ package uk.ac.bangor.meander.detectors.pipes;
 import Jama.Matrix;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.clusterers.Clustering;
-import uk.ac.bangor.meander.detectors.windowing.ClusteringPair;
-import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 import uk.ac.bangor.meander.detectors.clusterers.Cluster;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
+import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPair;
+import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.List;
@@ -17,10 +16,10 @@ import java.util.List;
  */
 public class SPLL2 {
 
-    public static class SPLLReduction implements Pipe<ClusteringPair, Double> {
+    public static class SPLLReduction implements Pipe<ClusteringWindowPair, Double> {
 
         @Override
-        public Double execute(ClusteringPair value, StreamContext context) {
+        public Double execute(ClusteringWindowPair value, StreamContext context) {
             double[] distances = distancesToW1Clusters(value.getHead().getNewest(), value);
 
             if(distances == null)
@@ -33,11 +32,11 @@ public class SPLL2 {
             return likelihoodTerm / distances.length;
         }
 
-        private double[] distancesToW1Clusters(Double[] example, ClusteringPair clusteringPair) {
-            double[] distributionW1 = clusteringPair.getP().getDistribution();
+        private double[] distancesToW1Clusters(Double[] example, ClusteringWindowPair clusteringWindowPair) {
+            double[] distributionW1 = clusteringWindowPair.getP().getDistribution();
             double[] distributionW2 = new double[distributionW1.length];
 
-            List<Cluster> w1Clusters = clusteringPair.getP().getClusters();
+            List<Cluster> w1Clusters = clusteringWindowPair.getP().getClusters();
 
             double[] clusterToExampleDistances = new double[distributionW1.length];
 
@@ -55,8 +54,8 @@ public class SPLL2 {
             double minDist = Double.POSITIVE_INFINITY;
             int minDistIndex = -1;
 
-            for(int i = 0; i < clusteringPair.getQ().getDistribution().length; i++) {
-                Double[] w2Example = clusteringPair.getHead().getElements()[i];
+            for (int i = 0; i < clusteringWindowPair.getQ().getDistribution().length; i++) {
+                Double[] w2Example = clusteringWindowPair.getHead().getElements()[i];
                 for(int k = 0; k < w1Clusters.size(); k++) {
                     Cluster cluster = w1Clusters.get(k);
 
@@ -81,7 +80,7 @@ public class SPLL2 {
 
             // Normalise distribution to 0..1
             for(int k = 0; k < w1Clusters.size(); k++) {
-                distributionW2[k] /= clusteringPair.getHead().size();
+                distributionW2[k] /= clusteringWindowPair.getHead().size();
             }
 
             return clusterToExampleDistances;
@@ -106,12 +105,12 @@ public class SPLL2 {
     }
 
     public static Pipe<Double[], Double> st(int size, int K) {
-        return new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K))
+        return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
                 .then(new SPLLReduction());
     }
 
     public static Pipe<Double[], Double> chiSq(int size, int K) {
-        return new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K))
+        return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
                 .then(new SPLLReduction())
                 .then(new CDF.ChiSquared());
     }

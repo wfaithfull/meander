@@ -34,8 +34,8 @@ public class Hotelling {
         @Override
         public CDF.FStatisticAndDegreesFreedom execute(WindowPair<Double[]> windowPair, StreamContext context) {
 
-            double[][] w1 = CollectionUtils.unbox(windowPair.getWindow1().getElements());
-            double[][] w2 = CollectionUtils.unbox(windowPair.getWindow2().getElements());
+            double[][] w1 = CollectionUtils.unbox(windowPair.getTail().getElements());
+            double[][] w2 = CollectionUtils.unbox(windowPair.getHead().getElements());
 
             double m1 = w1.length;
             double m2 = w2.length;

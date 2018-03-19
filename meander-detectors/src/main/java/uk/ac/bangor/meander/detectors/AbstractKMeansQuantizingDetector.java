@@ -16,8 +16,8 @@ import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import org.apache.commons.math3.random.RandomGeneratorFactory;
 import org.apache.commons.math3.stat.correlation.Covariance;
+import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
-import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  *
  * ** Deprecated because this is super slow compared to stream clustering. **
  *
- * Use {@link WindowPairClusteringQuantizer} instead which uses the baked in stream clustering framework
+ * Use {@link ClusteringWindowPairPipe} instead which uses the baked in stream clustering framework
  * for orders of magnitude speed increase.
  */
 @Deprecated
@@ -78,7 +78,7 @@ public abstract class AbstractKMeansQuantizingDetector {
         this.windowPair = windowPair;
         this.K = K;
         clusterer = new KMeansPlusPlusClusterer<>(K, 100, new EuclideanDistance(), RandomGeneratorFactory.createRandomGenerator(new Random()), KMeansPlusPlusClusterer.EmptyClusterStrategy.FARTHEST_POINT);
-        nObservations = windowPair.getWindow1().capacity();
+        nObservations = windowPair.getTail().capacity();
     }
 
     protected List<CentroidCluster<DoublePoint>> cluster(double[][] w1) {
@@ -144,8 +144,8 @@ public abstract class AbstractKMeansQuantizingDetector {
         if(windowPair.size() != windowPair.capacity())
             return;
 
-        double[][] window1 = windowPair.getWindow1().getElements();
-        double[][] window2 = windowPair.getWindow2().getElements();
+        double[][] window1 = windowPair.getTail().getElements();
+        double[][] window2 = windowPair.getHead().getElements();
 
         this.nFeatures = window1[0].length;
 

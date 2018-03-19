@@ -5,9 +5,9 @@ import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.clusterers.SlowApacheKMeansClusterer;
 import uk.ac.bangor.meander.detectors.controlchart.MR;
 import uk.ac.bangor.meander.detectors.pipes.*;
-import uk.ac.bangor.meander.detectors.windowing.ClusteringPair;
+import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPair;
+import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
-import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 import uk.ac.bangor.meander.detectors.windowing.WindowPairPipe;
 
 /**
@@ -18,15 +18,15 @@ public class Detectors {
     public static class Multivariate {
 
         public static Pipe<Double[], Boolean> klDetector(int size, int K) {
-            return new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K))
-                    .then(new ClusteringPair.Distribution())
+            return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
+                    .then(new ClusteringWindowPair.Distribution())
                     .then(new KL.KLReduction())
                     .then(new Threshold<>(Threshold.Op.GT, new KL.LikelihoodRatioThreshold(), new KL.KLStateStatistic()));
         }
 
         public static Pipe<Double[], Boolean> klDetector(int size, int K, ChartReporter reporter) {
-            return new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K))
-                    .then(new ClusteringPair.Distribution())
+            return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
+                    .then(new ClusteringWindowPair.Distribution())
                     .then(new KL.KLReduction())
                     .then(
                             new Threshold<>(Threshold.Op.GT, new KL.LikelihoodRatioThreshold(), new KL.KLStateStatistic())
@@ -35,8 +35,8 @@ public class Detectors {
         }
 
         public static Pipe<Double[], Double> klReduction(int size, int K) {
-            return new WindowPairClusteringQuantizer(size, () -> new KMeansStreamClusterer(K))
-                    .then(new ClusteringPair.Distribution())
+            return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
+                    .then(new ClusteringWindowPair.Distribution())
                     .then(new KL.KLReduction())
                     .then((value, context) -> value.getStatistic());
         }
@@ -97,7 +97,7 @@ public class Detectors {
         }
 
         public static Pipe<Double[], Boolean> spll2Detector(int W, int K, ChartReporter reporter) {
-            return new WindowPairClusteringQuantizer(W, () -> new SlowApacheKMeansClusterer(W, K))
+            return new ClusteringWindowPairPipe(W, () -> new SlowApacheKMeansClusterer(W, K))
                     .then(new SPLL2.SPLLReduction())
                     .then(new CDF.ChiSquared())
                     .then(
@@ -108,7 +108,7 @@ public class Detectors {
         }
 
         public static Pipe<Double[], Boolean> spll2Detector(int W, int K) {
-            return new WindowPairClusteringQuantizer(W, () -> new SlowApacheKMeansClusterer(W, K))
+            return new ClusteringWindowPairPipe(W, () -> new SlowApacheKMeansClusterer(W, K))
                     .then(new SPLL2.SPLLReduction())
                     .then(new CDF.ChiSquared())
                     .then(

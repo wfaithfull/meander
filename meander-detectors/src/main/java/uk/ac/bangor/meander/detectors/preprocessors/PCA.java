@@ -24,28 +24,31 @@ public class PCA {
      *
      * @author Will Faithfull
      */
-    public static class WindowPairTransform implements Pipe<WindowPair<Double[]>, WindowPair<Double[]>> {
+    public static class WindowPairTransform<T extends WindowPair<Double[]>> implements Pipe<T, T> {
 
         FixedWindow<Double[]> w1;
         FixedWindow<Double[]> w2;
 
         @Override
-        public WindowPair<Double[]> execute(WindowPair<Double[]> windowPair, StreamContext context) {
-            PrincipalComponents principalComponents = new PrincipalComponents(windowPair.getWindow1().getElements());
+        public T execute(T windowPair, StreamContext context) {
+            PrincipalComponents principalComponents = new PrincipalComponents(windowPair.getTail().getElements());
 
-            w1 = new FixedWindow<>(windowPair.getWindow1().size(), Double[].class);
-            w2 = new FixedWindow<>(windowPair.getWindow2().size(), Double[].class);
+            w1 = new FixedWindow<>(windowPair.getTail().size(), Double[].class);
+            w2 = new FixedWindow<>(windowPair.getHead().size(), Double[].class);
 
             // Transform W1, transform W2 with respect to W1's parameters.
             Matrix scoresW1 = principalComponents.getScores();
-            Matrix scoresW2 = principalComponents.transform(new Matrix(CollectionUtils.unbox(windowPair.getWindow2().getElements())));
+            Matrix scoresW2 = principalComponents.transform(new Matrix(CollectionUtils.unbox(windowPair.getHead().getElements())));
 
             for (int i = 0; i < scoresW1.getRowDimension(); i++) {
                 w1.add(CollectionUtils.box(scoresW1.getArray()[i]));
                 w2.add(CollectionUtils.box(scoresW2.getArray()[i]));
             }
 
-            return new WindowPair<>(w1, w2);
+            windowPair.setTail(w1);
+            windowPair.setHead(w2);
+
+            return windowPair;
         }
 
         public static Pipe<Double[], WindowPair<Double[]>> fromDouble(int size) {
