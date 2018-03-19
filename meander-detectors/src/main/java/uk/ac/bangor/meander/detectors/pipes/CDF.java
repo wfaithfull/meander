@@ -9,6 +9,8 @@ import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.stats.IncrementalStatistics;
 import uk.ac.bangor.meander.streams.StreamContext;
 
+import java.util.Optional;
+
 /**
  * Created by wfaithfull on 11/03/18.
  */
@@ -28,12 +30,12 @@ public class CDF {
         @Override
         public Double execute(FStatisticAndDegreesFreedom value, StreamContext context) {
             if(value.getDf1() <= 0 || value.getDf2() <= 0) {
-                return 1d;
+                return 0d;
             }
 
             fDistribution = new FDistribution(value.getDf1(), value.getDf2());
 
-            double pst = 1-fDistribution.cumulativeProbability(value.getStatistic());
+            double pst = fDistribution.cumulativeProbability(value.getStatistic());
             return pst;
         }
     }
@@ -68,8 +70,9 @@ public class CDF {
     public static class ChiSquared implements Pipe<Double,Double> {
 
         ChiSquaredDistribution cdf;
+        private Optional<Double> df = Optional.empty();
 
-        public double chiSq(Double statistic, int df) {
+        public double chiSq(Double statistic, double df) {
             if(cdf == null) {
                 cdf = new ChiSquaredDistribution(df);
             }
@@ -79,9 +82,20 @@ public class CDF {
             return cumulativeProbability;
         }
 
+        public ChiSquared() {
+        }
+
+        public ChiSquared(double df) {
+            this.df = Optional.of(df);
+        }
+
+        public ChiSquared(int df) {
+            this((double) df);
+        }
+
         @Override
         public Double execute(Double value, StreamContext context) {
-            return chiSq(value, context.getDimensionality());
+            return chiSq(value, df.orElse((double) context.getDimensionality()));
         }
     }
 
