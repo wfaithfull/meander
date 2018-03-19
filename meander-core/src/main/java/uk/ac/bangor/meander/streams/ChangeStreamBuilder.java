@@ -41,7 +41,7 @@ public class ChangeStreamBuilder {
         return fromArff(new InputStreamReader(ChangeStreamBuilder.class.getClassLoader().getResourceAsStream(file)));
     }
 
-    public SequenceBuilder withUniformClassMixture() {
+    public SequenceBuilder withUniformPriors() {
         List<ExampleProviderFactory> mixedSources = new ArrayList<>();
         double[] distribution = new double[classSampler.getClasses()];
 
@@ -57,7 +57,7 @@ public class ChangeStreamBuilder {
         return new SequenceBuilder(exampleProviderFactory);
     }
 
-    public SequenceBuilder withClassMixture(Function<Integer, double[]> distributionFunction) {
+    public SequenceBuilder withPriors(Function<Integer, double[]> distributionFunction) {
         List<ExampleProviderFactory> mixedSources = new ArrayList<>();
         for(int i = 0; i < classSampler.getClasses(); i++) {
             mixedSources.add(classSampler.toFactory(i));
@@ -67,7 +67,7 @@ public class ChangeStreamBuilder {
         return new SequenceBuilder(exampleProviderFactory);
     }
 
-    public SequenceBuilder withClassMixture(double... distribution) {
+    public SequenceBuilder withPriors(double... distribution) {
         List<ExampleProviderFactory> mixedSources = new ArrayList<>();
         for(int i = 0; i < classSampler.getClasses(); i++) {
             mixedSources.add(classSampler.toFactory(i));

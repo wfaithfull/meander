@@ -1,8 +1,7 @@
 package uk.ac.bangor.meander.evaluators;
 
 import lombok.extern.java.Log;
-import uk.ac.bangor.meander.detectors.Detector;
-import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
+import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.Example;
 import uk.ac.bangor.meander.streams.StreamContext;
 import uk.ac.bangor.meander.transitions.Transition;
@@ -22,21 +21,12 @@ import java.util.stream.Stream;
  *      Missed Detection Ratio  (MDR)
  */
 @Log
-public class BasicEvaluator extends AbstractEvaluator {
+public class SequenceEvaluator extends AbstractEvaluator {
 
     private static final long MAX_N = 3000000000L;
-    private final int warmup;
-
-    public BasicEvaluator(int warmup) {
-        this.warmup = warmup;
-    }
-
-    public BasicEvaluator() {
-        this(0);
-    }
 
     @Override
-    public Evaluation evaluate(Detector<Double[]> detector, Stream<Example> changeStream) {
+    public Evaluation evaluate(Pipe<Double[], Boolean> detector, Stream<Example> changeStream) {
 
         Iterator<Example> iterator = changeStream.iterator();
 
@@ -47,20 +37,26 @@ public class BasicEvaluator extends AbstractEvaluator {
 
         Transition transition = null;
 
-        if(warmup > 0) {
-            log.info(String.format("Warming up with %d examples...", warmup));
-        }
-        for(int i=warmup;i>0;i--) {
-            Example example = iterator.next();
-            detector.update(example.getData());
+        if(progressReporter != null) {
+            progressReporter.update(n, "Evaluating " + detector.toString());
         }
 
         while(iterator.hasNext() && n < MAX_N) {
             Example example = iterator.next();
             StreamContext ctx = example.getContext();
 
+            if(progressReporter != null) {
+                progressReporter.update(n);
+            }
+
             long index = ctx.getIndex();
-            detector.update(example.getData());
+
+            boolean detection = false;
+            try {
+                detection = detector.execute(example.getData(), ctx);
+            } catch (Pipe.NotReadyException notReady) {
+                // Shrug. We just have to continue.
+            }
 
             if(ctx.isChanging()) {
                 transition = ctx.getCurrentTransition().get();
@@ -69,7 +65,7 @@ public class BasicEvaluator extends AbstractEvaluator {
                 }
             }
 
-            if(detector.isChangeDetected()) {
+            if(detection) {
                 detections.add(index);
             }
 

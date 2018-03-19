@@ -1,6 +1,6 @@
 package uk.ac.bangor.meander.evaluators;
 
-import uk.ac.bangor.meander.detectors.Detector;
+import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.ChangeStreamBuilder;
 import uk.ac.bangor.meander.streams.Example;
 
@@ -23,7 +23,7 @@ public interface Evaluator {
      * @param changeStream Multivariate change stream.
      * @return
      */
-    Evaluation evaluate(Detector<Double[]> detector, Stream<Example> changeStream);
+    Evaluation evaluate(Pipe<Double[], Boolean> detector, Stream<Example> changeStream);
 
     /**
      * Evaluate {@code detector} over the specified {@code changeStream}.
@@ -31,6 +31,6 @@ public interface Evaluator {
      * @param changeStream Multivariate change stream.
      * @return
      */
-    Evaluation evaluate(Detector<Double[]> detector, ChangeStreamBuilder changeStream, long limit, long n);
+    Evaluation evaluate(Pipe<Double[], Boolean> detector, ChangeStreamBuilder changeStream, long limit, long n);
 
 }

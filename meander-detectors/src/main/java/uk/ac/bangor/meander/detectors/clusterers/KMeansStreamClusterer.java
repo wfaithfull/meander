@@ -26,6 +26,7 @@ public class KMeansStreamClusterer extends AbstractStreamClusterer implements St
             clusters[seen] = new CentroidCluster(example);
             assigned = seen;
         } else {
+
             int cluster = minimumSquaredEuclidean(example);
             clusters[cluster].add(example);
             assigned = cluster;
@@ -38,6 +39,15 @@ public class KMeansStreamClusterer extends AbstractStreamClusterer implements St
     @Override
     public void drop(int cluster, double[] example) {
         clusters[cluster].drop(example);
+    }
+
+    private boolean anyEmpty() {
+        for(Cluster cluster : clusters) {
+            if(cluster.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int minimumSquaredEuclidean(double[] example) {

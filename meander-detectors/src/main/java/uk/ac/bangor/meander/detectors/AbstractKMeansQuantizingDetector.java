@@ -17,6 +17,7 @@ import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import org.apache.commons.math3.random.RandomGeneratorFactory;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
+import uk.ac.bangor.meander.detectors.windowing.WindowPairClusteringQuantizer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,13 @@ import java.util.stream.Collectors;
  *
  * This uses the Apache commons KMeansPlusPlusClusterer for clustering, although in theory it should be straightforward
  * to substitute this for another clustering algorithm.
+ *
+ * ** Deprecated because this is super slow compared to stream clustering. **
+ *
+ * Use {@link WindowPairClusteringQuantizer} instead which uses the baked in stream clustering framework
+ * for orders of magnitude speed increase.
  */
+@Deprecated
 public abstract class AbstractKMeansQuantizingDetector {
 
     protected final WindowPair<double[]>                 windowPair;

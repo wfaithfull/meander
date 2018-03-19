@@ -32,7 +32,7 @@ public class FixedWindow<T> extends CircularFifoQueue<T> implements Window<T> {
     }
 
     public T getNewest() {
-        return get(size());
+        return get(size() - 1);
     }
 
     public T getOldest() {

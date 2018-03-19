@@ -1,11 +1,11 @@
 package uk.ac.bangor.meander.evaluators;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import uk.ac.bangor.meander.MeanderException;
 import uk.ac.bangor.meander.transitions.Transition;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -16,14 +16,14 @@ import java.util.List;
 @Data
 public class Evaluation {
 
-    private int earlyDetection;
-    private long n;
-    private long missed;
-    private List<Long> detections;
-    private List<Long> ttds;
-    private List<Long> rls;
-    private List<Long> falseAlarms;
-    private double idealARL;
+    private int              earlyDetection;
+    private long             n;
+    private long             missed;
+    private List<Long>       detections;
+    private List<Long>       ttds;
+    private List<Long>       rls;
+    private List<Long>        falseAlarms;
+    private double           idealARL;
     private List<Transition> transitions;
 
     double arl;
@@ -41,12 +41,10 @@ public class Evaluation {
 
     public Evaluation(List<Evaluation> evaluations) {
         long n = 0;
-        long missed = 0;
         List<Long> detections = new ArrayList<>();
         List<Long> ttds = new ArrayList<>();
         List<Long> rls = new ArrayList<>();
         List<Long> falseAlarms = new ArrayList<>();
-        double idealARL = 0;
         List<Transition> transitions = new ArrayList<>();
 
         int earlyDetection = evaluations.get(0).getEarlyDetection();
@@ -56,13 +54,11 @@ public class Evaluation {
                 throw new MeanderException("Inconsistent values for early detection in evaluations list. Cannot proceed.");
             }
             n += evaluation.getN();
-            missed += evaluation.getMissed();
             detections.addAll(evaluation.getDetections());
             ttds.addAll(evaluation.getTtds());
             rls.addAll(evaluation.getRls());
             falseAlarms.addAll(evaluation.getFalseAlarms());
-            idealARL += evaluation.idealARL;
-            this.transitions.addAll(evaluation.getTransitions());
+            transitions.addAll(evaluation.getTransitions());
         }
 
         prepare(n, transitions, detections, earlyDetection);
@@ -90,8 +86,17 @@ public class Evaluation {
             this.ttd = n;
         }
 
-        this.mdr = missed / n;
-        this.far = falseAlarms.size() / (double)n;
+        if(missed == 0 && transitions.size() == 0) {
+            this.mdr = Double.NaN;
+        } else {
+            this.mdr = missed / (double) transitions.size();
+        }
+
+        if(n == 0) {
+            this.far = Double.NaN;
+        } else {
+            this.far = falseAlarms.size() / (double) n;
+        }
     }
 
     private void computeDetections() {
@@ -102,6 +107,19 @@ public class Evaluation {
             // No detections means all transitions were missed.
             missed = this.transitions.size();
         } else {
+            Iterator<Long> iterator = detections.iterator();
+            long firstTn = transitions.get(0).getStart() - earlyDetection;
+            long detection = iterator.next();
+            while (detection < firstTn) {
+                falseAlarms.add(detection);
+
+                if(!iterator.hasNext()) {
+                    break;
+                } else {
+                    detection = iterator.next();
+                }
+            }
+
             // Iterate transitions and find matching detections.
             for(int tIdx = 0; tIdx < this.transitions.size(); tIdx++) {
 
@@ -113,29 +131,31 @@ public class Evaluation {
 
                 // Was transition A detected?
                 boolean detected = false;
+                long bStart = b != null ? b.getStart() - earlyDetection : n;
 
-                for(int dIdx = 0; dIdx < detections.size(); dIdx++) {
-                    long detection = detections.get(dIdx);
-
-                    long bStart = b != null ? b.getStart() - earlyDetection : Long.MAX_VALUE;
-
-                    if(detection > bStart) {
-
-                        if(!detected) {
-                            missed++;
-                        }
-
-                        break;
-                    }
-
-                    if(detection >= a.getStart() - earlyDetection && detection < bStart) {
-                        if(detected) {
+                while (detection < bStart) {
+                    if (detection >= a.getStart() - earlyDetection) {
+                        if (detected) {
                             this.falseAlarms.add(detection);
                         } else {
                             detected = true;
                             this.ttds.add(detection - a.getStart());
                         }
                     }
+
+                    if(iterator.hasNext()) {
+                        detection = iterator.next();
+                    } else {
+                        break;
+                    }
+                }
+
+                if (!detected && detection > bStart) {
+                    // Then next detection is for the next transition
+                    missed++;
+                } else if(!detected && !iterator.hasNext()) {
+                    // Then there are no more detections
+                    missed++;
                 }
             }
         }

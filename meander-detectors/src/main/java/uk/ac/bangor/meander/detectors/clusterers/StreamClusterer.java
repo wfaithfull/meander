@@ -1,17 +1,11 @@
 package uk.ac.bangor.meander.detectors.clusterers;
 
-import java.util.List;
-
 /**
  * @author Will Faithfull
  */
-public interface StreamClusterer {
+public interface StreamClusterer extends Clustering {
 
     int update(double[] example);
-
-    List<Cluster> getClusters();
-
-    double[] getDistribution();
 
     void drop(int cluster, double[] example);
 
