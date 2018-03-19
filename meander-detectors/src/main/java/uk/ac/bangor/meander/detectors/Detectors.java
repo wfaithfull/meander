@@ -51,7 +51,7 @@ public class Detectors {
         public static Pipe<Double[], Boolean> hotellingDetector(int size, ChartReporter reporter) {
             return new WindowPairPipe(size)
                     .then(new Hotelling.TsqReduction())
-                    .then(new CDF.FWithDF()).then(new CDF.Inverse())
+                    .then(new CDF.FWithDF()).then(new CDF.Complementary())
                     // Threshold inverts the cumulative probability
                     .then(Threshold.lessThan(0.05)
                             .report(reporter::lcl, reporter::statistic));

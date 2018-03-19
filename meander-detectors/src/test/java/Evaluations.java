@@ -3,6 +3,7 @@ import uk.ac.bangor.meander.detectors.JFreeChartReporter;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.ReportPipe;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
+import uk.ac.bangor.meander.detectors.clusterers.SlowApacheKMeansClusterer;
 import uk.ac.bangor.meander.detectors.controlchart.MR;
 import uk.ac.bangor.meander.detectors.ensemble.DecayingMajority;
 import uk.ac.bangor.meander.detectors.ensemble.LogisticDecayFunction;
@@ -64,17 +65,17 @@ public class Evaluations {
         Pipe<Double[], Boolean> hotelling = new WindowPairPipe(100)
                 .then(new PCA.WindowPairTransform())
                 .then(new Hotelling.TsqReduction())
-                .then(new CDF.FWithDF().then(new CDF.Inverse()))
+                .then(new CDF.FWithDF().then(new CDF.Complementary()))
                 .then(Threshold.lessThan(0.05));
 
-        evaluate(new ClusteringWindowPairPipe(100, () -> new KMeansStreamClusterer(3))
+        evaluate(new ClusteringWindowPairPipe(50, () -> new SlowApacheKMeansClusterer(50, 3))
                 .then(new PCA.WindowPairTransform())
                 .then(new SPLL2.SPLLReduction())
-                .then(new CDF.ChiSquared().then(new CDF.Inverse()))
+                        .then(new CDF.ChiSquared(10).then(new CDF.Folded()))
                 // Threshold inverts the cumulative probability
                 .then(Threshold.lessThan(0.05)
-                        .report(reporter::lcl, reporter::statistic))
-                .then(new ResetOnChangeDetected()), arffStream);
+                        .report(reporter::lcl, reporter::statistic)),
+                arffStream);
         /*evaluate(new SubspaceEnsemble(() -> Detectors.Univariate.movingRangeChart())
                 .then(new DecayingMajority(new LinearDecayFunction(50)))
                 .then(Threshold.greaterThan(.25).report(reporter::ucl, reporter::statistic))

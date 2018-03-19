@@ -40,10 +40,17 @@ public class CDF {
         }
     }
 
-    public static class Inverse implements Pipe<Double, Double> {
+    public static class Complementary implements Pipe<Double, Double> {
         @Override
         public Double execute(Double value, StreamContext context) {
             return 1d - value;
+        }
+    }
+
+    public static class Folded implements Pipe<Double, Double> {
+        @Override
+        public Double execute(Double value, StreamContext context) {
+            return Math.min(value, 1d - value);
         }
     }
 
