@@ -105,13 +105,14 @@ rather than inducing artificial change arbitrarily.
 
 Meander uses the change generation framework discussed in [2] and [3].
 
-We can say that a data source ![S_i, i=1,...,K](https://latex.codecogs.com/gif.latex?S_i%2C%20i%3D1%2C...%2CK) is a set of class conditional probability density functions ![](http://www.sciweavers.org/upload/Tex2Img_1512415255/render.png) and prior probabilities ![](http://www.sciweavers.org/upload/Tex2Img_1512415290/render.png).
-
-A changing data stream at time `t` can be considered a mixture of these prior probabilities and class conditional probability density functions.
+We can say that a data source ![S_i, i=1,...,K](https://latex.codecogs.com/gif.latex?S_i%2C%20i%3D1%2C...%2CK) is a set of class conditional probability density functions and prior probabilities.
 
 ![p_i(\vec{x}|y_j)](https://latex.codecogs.com/gif.latex?p_i%28%5Cvec%7Bx%7D%7Cy_j%29)
 
 ![p_i(y_j)$, $j = 1, ..., k](https://latex.codecogs.com/gif.latex?p_i%28y_j%29%24%2C%20%24j%20%3D%201%2C%20...%2C%20k)
+
+A changing data stream at time `t` can be considered a mixture of these prior probabilities and class conditional probability density functions.
+
 
 This is controlled by a mixing function 
 
