@@ -1,6 +1,6 @@
 # Meander
 
-> A byproduct of the PhD research of the author, [Will Faithfull](will.faithfull.me).
+> A byproduct of the PhD research of the author, [Will Faithfull](https://will.faithfull.me).
 
 ## Functional Change Detector Pipelines
 
