@@ -55,7 +55,7 @@ This amounts to the "Hotelling" detector from [1]. Significantly, we can easily 
 
 ```
 Pipe<Double[], Boolean> hotelling = new WindowPairPipe(100)
-	.then(new WindowPairTransform())
+	.then(new PCAWindowPairTransform())
 	.then(new TSquared())
 	.then(new FWithDF().complementary())
     .then(Threshold.lessThan(0.05));
