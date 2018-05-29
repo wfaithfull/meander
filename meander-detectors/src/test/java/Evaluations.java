@@ -9,10 +9,8 @@ import uk.ac.bangor.meander.detectors.controlchart.pipes.MovingRangeThreshold;
 import uk.ac.bangor.meander.detectors.ensemble.pipes.DecayingMajority;
 import uk.ac.bangor.meander.detectors.ensemble.pipes.SubspaceEnsemble;
 import uk.ac.bangor.meander.detectors.ensemble.support.LogisticDecayFunction;
-import uk.ac.bangor.meander.detectors.m2d.Hotelling;
-import uk.ac.bangor.meander.detectors.m2d.KL;
-import uk.ac.bangor.meander.detectors.m2d.SPLL;
-import uk.ac.bangor.meander.detectors.m2d.SPLL2;
+import uk.ac.bangor.meander.detectors.m2d.pipes.*;
+import uk.ac.bangor.meander.detectors.m2d.support.KLState;
 import uk.ac.bangor.meander.detectors.preprocessors.pipes.PCAFeatureSelector;
 import uk.ac.bangor.meander.detectors.preprocessors.support.PCAExtractionOptions;
 import uk.ac.bangor.meander.detectors.stats.cdf.pipes.ChiSquared;
@@ -50,7 +48,7 @@ public class Evaluations {
         int W = 25;
 
         JFreeChartReporter reporter = new JFreeChartReporter("Subspace");
-        Pipe<Double[], Boolean> spll = new SPLL(new WindowPair<double[]>(W, W, double[].class),5)
+        Pipe<Double[], Boolean> spll = new SPLLDetector(new WindowPair<double[]>(W, W, double[].class), 5)
                 .then(new ChiSquared(), reporter::statistic)
                 .then(Threshold.lessThan(0.05).reportThreshold(reporter::lcl));
 
@@ -58,9 +56,9 @@ public class Evaluations {
 
         Pipe kl = new WindowPairClustering(W, () -> new KMeansStreamClusterer(3))
                 .then(new ClusteringWindowPair.Distribution())
-                .then(new KL.KLReduction())
-                .then(new ReportPipe<>(reporter::statistic, KL.KLState::getStatistic))
-                .then(new Threshold<>(Threshold.Op.GT, new KL.LikelihoodRatioThreshold(), new KL.KLStateStatistic())
+                .then(new KL())
+                .then(new ReportPipe<>(reporter::statistic, KLState::getStatistic))
+                .then(new Threshold<>(Threshold.Op.GT, new KLLikelihoodRatioThreshold(), new KLStateStatistic())
                         .reportThreshold(reporter::ucl));
 
         Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MovingRange().then(new MovingRangeThreshold());
@@ -74,7 +72,7 @@ public class Evaluations {
         Pipe<Double[], Boolean> hotelling =
                 new PCAFeatureSelector(.2, PCAExtractionOptions.KEEP_LEAST_VARIANT, true).then(
                         new WindowPairPipe(100)
-                                .then(new Hotelling.TsqReduction().then(new ReportPipe<>(reporter::statistic, f -> f.getStatistic())))
+                                .then(new TSquared().then(new ReportPipe<>(reporter::statistic, f -> f.getStatistic())))
                                 .then(new FWithDF().complementary())
                                 .then(Threshold.lessThan(0.05)));
 

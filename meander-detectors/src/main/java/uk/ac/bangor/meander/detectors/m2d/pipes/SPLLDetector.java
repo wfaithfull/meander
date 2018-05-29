@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.m2d;
+package uk.ac.bangor.meander.detectors.m2d.pipes;
 
 import lombok.extern.java.Log;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
@@ -11,12 +11,12 @@ import uk.ac.bangor.meander.streams.StreamContext;
  * @author Will Faithfull
  */
 @Log
-public class SPLL extends AbstractKMeansQuantizingDetector implements Pipe<Double[], Double> {
+public class SPLLDetector extends AbstractKMeansQuantizingDetector implements Pipe<Double[], Double> {
 
     ChiSquaredDistribution cdf;
     private double statistic;
 
-    public SPLL(WindowPair<double[]> windowPair, int K) {
+    public SPLLDetector(WindowPair<double[]> windowPair, int K) {
         super(windowPair, K);
     }
 
