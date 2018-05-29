@@ -7,7 +7,7 @@ import uk.ac.bangor.meander.detectors.Threshold;
 import uk.ac.bangor.meander.detectors.clusterers.Cluster;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.stats.cdf.ChiSquared;
-import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
+import uk.ac.bangor.meander.detectors.windowing.WindowPairClustering;
 import uk.ac.bangor.meander.detectors.windowing.support.ClusteringWindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 
@@ -107,12 +107,12 @@ public class SPLL2 {
     }
 
     public static Pipe<Double[], Double> st(int size, int K) {
-        return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
+        return new WindowPairClustering(size, () -> new KMeansStreamClusterer(K))
                 .then(new SPLLReduction());
     }
 
     public static Pipe<Double[], Double> chiSq(int size, int K) {
-        return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
+        return new WindowPairClustering(size, () -> new KMeansStreamClusterer(K))
                 .then(new SPLLReduction())
                 .then(new ChiSquared());
     }

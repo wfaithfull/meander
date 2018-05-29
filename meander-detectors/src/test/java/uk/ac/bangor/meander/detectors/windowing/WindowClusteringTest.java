@@ -15,21 +15,21 @@ import java.util.List;
  * @author Will Faithfull
  */
 @Log
-public class ClusteringWindowTest {
+public class WindowClusteringTest {
 
     @Test
     public void testClusteringWindow() {
-        ClusteringWindow clusteringWindow = new ClusteringWindow(30, new KMeansStreamClusterer(3));
+        WindowClustering windowClustering = new WindowClustering(30, new KMeansStreamClusterer(3));
 
-        evenDistribution(30, clusteringWindow);
+        evenDistribution(30, windowClustering);
 
-        showClusters(clusteringWindow);
+        showClusters(windowClustering);
     }
 
     @Test
     public void testClusteringWindowPair() {
-        ClusteringWindow w1 = new ClusteringWindow(30, new KMeansStreamClusterer(3));
-        ClusteringWindow w2 = new ClusteringWindow(30, new KMeansStreamClusterer(3));
+        WindowClustering w1 = new WindowClustering(30, new KMeansStreamClusterer(3));
+        WindowClustering w2 = new WindowClustering(30, new KMeansStreamClusterer(3));
 
         evenDistribution(60, new WindowPair<>(w1, w2));
 
@@ -37,8 +37,8 @@ public class ClusteringWindowTest {
         showClusters(w2);
     }
 
-    public void showClusters(ClusteringWindow clusteringWindow) {
-        StreamClusterer clusterer = clusteringWindow.getClusterer();
+    public void showClusters(WindowClustering windowClustering) {
+        StreamClusterer clusterer = windowClustering.getClusterer();
         List<Cluster> clusterList = clusterer.getClusters();
         for(Cluster cluster : clusterList) {
             log.info(String.format("Cluster %s - population %d", Arrays.toString(cluster.getCentre()), cluster.getWeight()));

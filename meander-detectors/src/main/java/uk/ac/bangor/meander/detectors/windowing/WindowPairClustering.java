@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 /**
  * @author Will Faithfull
  */
-public class ClusteringWindowPairPipe implements Pipe<Double[], ClusteringWindowPair> {
+public class WindowPairClustering implements Pipe<Double[], ClusteringWindowPair> {
 
     private final int                                                                  size;
     private final Supplier<StreamClusterer>                                            clustererSupplier;
@@ -23,14 +23,14 @@ public class ClusteringWindowPairPipe implements Pipe<Double[], ClusteringWindow
     double[] q;
     private WindowPair<Double[]> windowPair;
     @Getter
-    private ClusteringWindow     tail, head;
+    private WindowClustering     tail, head;
 
-    public ClusteringWindowPairPipe(int size, Supplier<StreamClusterer> clustererSupplier) {
+    public WindowPairClustering(int size, Supplier<StreamClusterer> clustererSupplier) {
         this(size, clustererSupplier, (t, h) -> new WindowPair<>(t, h));
     }
 
-    public ClusteringWindowPairPipe(int size, Supplier<StreamClusterer> clustererSupplier,
-                                    BiFunction<Window<Double[]>, Window<Double[]>, WindowPair<Double[]>> windowPairFactory) {
+    public WindowPairClustering(int size, Supplier<StreamClusterer> clustererSupplier,
+                                BiFunction<Window<Double[]>, Window<Double[]>, WindowPair<Double[]>> windowPairFactory) {
         this.size = size;
         this.clustererSupplier = clustererSupplier;
         this.windowPairFactory = windowPairFactory;
@@ -59,8 +59,8 @@ public class ClusteringWindowPairPipe implements Pipe<Double[], ClusteringWindow
 
     @Override
     public void reset() {
-        tail = new ClusteringWindow(size, clustererSupplier.get());
-        head = new ClusteringWindow(size, clustererSupplier.get());
+        tail = new WindowClustering(size, clustererSupplier.get());
+        head = new WindowClustering(size, clustererSupplier.get());
 
         windowPair = windowPairFactory.apply(tail, head); // new WindowPair<>(tail, head);
     }

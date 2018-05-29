@@ -14,13 +14,13 @@ import java.util.Queue;
 /**
  * @author Will Faithfull
  */
-public class ClusteringWindow extends FixedWindow<Double[]> implements Pipe<Double[], Clustering> {
+public class WindowClustering extends FixedWindow<Double[]> implements Pipe<Double[], Clustering> {
 
     @Getter
     private final StreamClusterer clusterer;
     private       Queue<Integer>  assignments;
 
-    public ClusteringWindow(int size, StreamClusterer clusterer) {
+    public WindowClustering(int size, StreamClusterer clusterer) {
         super(size, Double[].class);
         this.clusterer = clusterer;
         this.assignments = new LinkedList<>();

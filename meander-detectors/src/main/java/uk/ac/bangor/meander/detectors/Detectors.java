@@ -10,7 +10,7 @@ import uk.ac.bangor.meander.detectors.m2d.SPLL;
 import uk.ac.bangor.meander.detectors.m2d.SPLL2;
 import uk.ac.bangor.meander.detectors.stats.cdf.ChiSquared;
 import uk.ac.bangor.meander.detectors.stats.cdf.FWithDF;
-import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
+import uk.ac.bangor.meander.detectors.windowing.WindowPairClustering;
 import uk.ac.bangor.meander.detectors.windowing.WindowPairPipe;
 import uk.ac.bangor.meander.detectors.windowing.support.ClusteringWindowPair;
 import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
@@ -23,14 +23,14 @@ public class Detectors {
     public static class Multivariate {
 
         public static Pipe<Double[], Boolean> klDetector(int size, int K) {
-            return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
+            return new WindowPairClustering(size, () -> new KMeansStreamClusterer(K))
                     .then(new ClusteringWindowPair.Distribution())
                     .then(new KL.KLReduction())
                     .then(new Threshold<>(Threshold.Op.GT, new KL.LikelihoodRatioThreshold(), new KL.KLStateStatistic()));
         }
 
         public static Pipe<Double[], Boolean> klDetector(int size, int K, ChartReporter reporter) {
-            return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
+            return new WindowPairClustering(size, () -> new KMeansStreamClusterer(K))
                     .then(new ClusteringWindowPair.Distribution())
                     .then(new KL.KLReduction())
                     .then(
@@ -40,7 +40,7 @@ public class Detectors {
         }
 
         public static Pipe<Double[], Double> klReduction(int size, int K) {
-            return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
+            return new WindowPairClustering(size, () -> new KMeansStreamClusterer(K))
                     .then(new ClusteringWindowPair.Distribution())
                     .then(new KL.KLReduction())
                     .then((value, context) -> value.getStatistic());
@@ -102,7 +102,7 @@ public class Detectors {
         }
 
         public static Pipe<Double[], Boolean> spll2Detector(int W, int K, ChartReporter reporter) {
-            return new ClusteringWindowPairPipe(W, () -> new SlowApacheKMeansClusterer(W, K))
+            return new WindowPairClustering(W, () -> new SlowApacheKMeansClusterer(W, K))
                     .then(new SPLL2.SPLLReduction())
                     .then(new ChiSquared())
                     .then(
@@ -113,7 +113,7 @@ public class Detectors {
         }
 
         public static Pipe<Double[], Boolean> spll2Detector(int W, int K) {
-            return new ClusteringWindowPairPipe(W, () -> new SlowApacheKMeansClusterer(W, K))
+            return new WindowPairClustering(W, () -> new SlowApacheKMeansClusterer(W, K))
                     .then(new SPLL2.SPLLReduction())
                     .then(new ChiSquared())
                     .then(
