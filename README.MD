@@ -37,9 +37,9 @@ This library offers basic building blocks with which to build some common change
 For example, a detector which uses Hotelling's T-squared test on adjacent time-windows of data can be created as follows:
 
 ```
-Pipe<Double[], Boolean> hotelling = new WindowPairPipe(100)
-	.then(new Hotelling.TsqReduction())
-	.then(new CDF.FWithDF().then(new CDF.Inverse()))
+Pipe<Double[], Boolean> tsq = new WindowPairPipe(100)
+	.then(new TSquared())
+	.then(new FWithDF().complementary())
 	.then(Threshold.lessThan(0.05));
 ```
 
@@ -47,17 +47,18 @@ This pipeline
 
 - Populates a pair of sliding windows (50,50).
 - Calculates the Hotelling's T-squared statistic between their elements.
-- Finds the statistic's p-value on the inverse cumulative distribution function of an F distribution.
-- Signals change if the p-value is less than 0.05.
+- Finds the statistic's p-value on the cumulative distribution function of an F distribution.
+- Takes the complementary probability (1-p)
+- Signals change if the result is less than 0.05.
 
 This amounts to the "Hotelling" detector from [1]. Significantly, we can easily add or replace steps in this pipeline without any reengineering. Below, we assess the impact of a PCA feature extraction step:
 
 ```
 Pipe<Double[], Boolean> hotelling = new WindowPairPipe(100)
-	.then(new PCA.WindowPairTransform())
-	.then(new Hotelling.TsqReduction())
-	.then(new CDF.FWithDF().then(new CDF.Inverse()))
- .then(Threshold.lessThan(0.05));
+	.then(new WindowPairTransform())
+	.then(new TSquared())
+	.then(new FWithDF().complementary())
+    .then(Threshold.lessThan(0.05));
 ```
 
 ## Evaluation
