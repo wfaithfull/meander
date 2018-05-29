@@ -5,6 +5,7 @@ import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.clusterers.StreamClusterer;
 import uk.ac.bangor.meander.streams.StreamContext;
 
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
@@ -12,8 +13,9 @@ import java.util.function.Supplier;
  */
 public class ClusteringWindowPairPipe implements Pipe<Double[], ClusteringWindowPair> {
 
-    private final int                       size;
-    private final Supplier<StreamClusterer> clustererSupplier;
+    private final int                                                                  size;
+    private final Supplier<StreamClusterer>                                            clustererSupplier;
+    private       BiFunction<Window<Double[]>, Window<Double[]>, WindowPair<Double[]>> windowPairFactory;
     double[] p;
     double[] q;
     private WindowPair<Double[]> windowPair;
@@ -21,8 +23,14 @@ public class ClusteringWindowPairPipe implements Pipe<Double[], ClusteringWindow
     private ClusteringWindow     tail, head;
 
     public ClusteringWindowPairPipe(int size, Supplier<StreamClusterer> clustererSupplier) {
+        this(size, clustererSupplier, (t, h) -> new WindowPair<>(t, h));
+    }
+
+    public ClusteringWindowPairPipe(int size, Supplier<StreamClusterer> clustererSupplier,
+                                    BiFunction<Window<Double[]>, Window<Double[]>, WindowPair<Double[]>> windowPairFactory) {
         this.size = size;
         this.clustererSupplier = clustererSupplier;
+        this.windowPairFactory = windowPairFactory;
         reset();
     }
 
@@ -51,12 +59,13 @@ public class ClusteringWindowPairPipe implements Pipe<Double[], ClusteringWindow
         tail = new ClusteringWindow(size, clustererSupplier.get());
         head = new ClusteringWindow(size, clustererSupplier.get());
 
-        windowPair = new WindowPair<>(tail, head);
+        windowPair = windowPairFactory.apply(tail, head); // new WindowPair<>(tail, head);
     }
 
     @Override
     public ClusteringWindowPair execute(Double[] value, StreamContext context) {
         update(value);
+
         return new ClusteringWindowPair(tail, head, tail.getClusterer(), head.getClusterer());
     }
 

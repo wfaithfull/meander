@@ -6,6 +6,7 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
+import uk.ac.bangor.meander.detectors.pipes.cdf.FStatisticAndDegreesFreedom;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 
@@ -14,7 +15,7 @@ import uk.ac.bangor.meander.streams.StreamContext;
  */
 public class Hotelling {
 
-    public static class TsqReduction implements Pipe<WindowPair<Double[]>, CDF.FStatisticAndDegreesFreedom> {
+    public static class TsqReduction implements Pipe<WindowPair<Double[]>, FStatisticAndDegreesFreedom> {
 
         private static final int MAX_CONDITION = 10000;
         private int df1,df2;
@@ -32,7 +33,7 @@ public class Hotelling {
         }
 
         @Override
-        public CDF.FStatisticAndDegreesFreedom execute(WindowPair<Double[]> windowPair, StreamContext context) {
+        public FStatisticAndDegreesFreedom execute(WindowPair<Double[]> windowPair, StreamContext context) {
 
             double[][] w1 = CollectionUtils.unbox(windowPair.getTail().getElements());
             double[][] w2 = CollectionUtils.unbox(windowPair.getHead().getElements());
@@ -73,7 +74,7 @@ public class Hotelling {
             df1 = (int)n;
             df2 = (int)(m1 + m2 - n - 1);
 
-            return new CDF.FStatisticAndDegreesFreedom(df1, df2, tsq);
+            return new FStatisticAndDegreesFreedom(df1, df2, tsq);
         }
     }
 

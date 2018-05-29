@@ -5,6 +5,7 @@ import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.clusterers.Cluster;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
+import uk.ac.bangor.meander.detectors.pipes.cdf.ChiSquared;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPair;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
 import uk.ac.bangor.meander.streams.StreamContext;
@@ -112,6 +113,6 @@ public class SPLL2 {
     public static Pipe<Double[], Double> chiSq(int size, int K) {
         return new ClusteringWindowPairPipe(size, () -> new KMeansStreamClusterer(K))
                 .then(new SPLLReduction())
-                .then(new CDF.ChiSquared());
+                .then(new ChiSquared());
     }
 }

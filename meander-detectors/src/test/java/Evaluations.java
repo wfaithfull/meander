@@ -3,12 +3,13 @@ import uk.ac.bangor.meander.detectors.JFreeChartReporter;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.ReportPipe;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
-import uk.ac.bangor.meander.detectors.clusterers.SlowApacheKMeansClusterer;
 import uk.ac.bangor.meander.detectors.controlchart.MR;
 import uk.ac.bangor.meander.detectors.ensemble.DecayingMajority;
 import uk.ac.bangor.meander.detectors.ensemble.LogisticDecayFunction;
 import uk.ac.bangor.meander.detectors.ensemble.SubspaceEnsemble;
 import uk.ac.bangor.meander.detectors.pipes.*;
+import uk.ac.bangor.meander.detectors.pipes.cdf.ChiSquared;
+import uk.ac.bangor.meander.detectors.pipes.cdf.FWithDF;
 import uk.ac.bangor.meander.detectors.preprocessors.PCA;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPair;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
@@ -44,7 +45,7 @@ public class Evaluations {
 
         JFreeChartReporter reporter = new JFreeChartReporter("Subspace");
         Pipe<Double[], Boolean> spll = new SPLL(new WindowPair<double[]>(W, W, double[].class),5)
-                .then(new CDF.ChiSquared(), reporter::statistic)
+                .then(new ChiSquared(), reporter::statistic)
                 .then(Threshold.lessThan(0.05).reportThreshold(reporter::lcl));
 
         Pipe<Double[], Boolean> detector = SPLL2.detector(W, 3);
@@ -57,25 +58,32 @@ public class Evaluations {
                         .reportThreshold(reporter::ucl));
 
         Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MR.MRReduction().then(new MR.MRThreshold());
-        Pipe<Double[], Boolean> subspace = new SubspaceEnsemble(mrSupplier)
+        Pipe<Double[], Boolean> subspace =
+                new PCA.PCAFeatureSelector()
+                        .then(new SubspaceEnsemble(mrSupplier)
                 .then(new DecayingMajority(new LogisticDecayFunction()))
                 .then(new ReportPipe<>(reporter::statistic, Function.identity()))
-                .then(Threshold.greaterThan(.25).reportThreshold(reporter::ucl));
+                                .then(Threshold.greaterThan(.25).reportThreshold(reporter::ucl)));
 
-        Pipe<Double[], Boolean> hotelling = new WindowPairPipe(100)
-                .then(new PCA.WindowPairTransform())
-                .then(new Hotelling.TsqReduction())
-                .then(new CDF.FWithDF().then(new CDF.Complementary()))
-                .then(Threshold.lessThan(0.05));
+        Pipe<Double[], Boolean> hotelling =
+                new PCA.PCAFeatureSelector(.2, PCA.ExtractionOptions.KEEP_LEAST_VARIANT).then(
+                        new WindowPairPipe(100)
+                                .then(new Hotelling.TsqReduction().then(new ReportPipe<>(reporter::statistic, f -> f.getStatistic())))
+                                .then(new FWithDF().complementary())
+                                .then(Threshold.lessThan(0.05)));
 
-        evaluate(new ClusteringWindowPairPipe(50, () -> new SlowApacheKMeansClusterer(50, 3))
-                .then(new PCA.WindowPairTransform())
-                .then(new SPLL2.SPLLReduction())
-                        .then(new CDF.ChiSquared(10).then(new CDF.Folded()))
-                // Threshold inverts the cumulative probability
-                .then(Threshold.lessThan(0.05)
-                        .report(reporter::lcl, reporter::statistic)),
-                arffStream);
+//        evaluate(new ClusteringWindowPairPipe(50,
+//                        () -> new SlowApacheKMeansClusterer(50, 3),
+//                        (t,h) -> new FixedTailWindowPair<>(t, h))
+//                .then(new PCA.WindowPairTransform(PCA.ExtractionOptions.KEEP_LEAST_VARIANT, 0.1))
+//                .then(new SPLL2.SPLLReduction())
+//                        .then(new CDF.ChiSquared(10).then(new CDF.Folded()))
+//                // Threshold inverts the cumulative probability
+//                .then(Threshold.lessThan(0.05)
+//                        .report(reporter::lcl, reporter::statistic)),
+//                arffStream);
+
+        evaluate(hotelling, arffStream);
         /*evaluate(new SubspaceEnsemble(() -> Detectors.Univariate.movingRangeChart())
                 .then(new DecayingMajority(new LinearDecayFunction(50)))
                 .then(Threshold.greaterThan(.25).report(reporter::ucl, reporter::statistic))
