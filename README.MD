@@ -1,6 +1,6 @@
-# Meander
+![alt text](meander-logo.png "Meander Logo")
 
-> A byproduct of the PhD research of the author, [Will Faithfull](https://will.faithfull.me).
+> A library for functional change detection, and change detector evaluation. A byproduct of the PhD research of [Will Faithfull](https://will.faithfull.me).
 
 ## Functional Change Detector Pipelines
 
