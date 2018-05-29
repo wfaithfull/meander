@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.pipes;
+package uk.ac.bangor.meander.detectors.m2d;
 
 import lombok.extern.java.Log;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;

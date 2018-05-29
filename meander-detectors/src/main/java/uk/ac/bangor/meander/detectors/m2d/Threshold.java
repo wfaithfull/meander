@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.pipes;
+package uk.ac.bangor.meander.detectors.m2d;
 
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.StreamContext;

@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.pipes;
+package uk.ac.bangor.meander.detectors.m2d;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -6,7 +6,7 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.pipes.cdf.FStatisticAndDegreesFreedom;
+import uk.ac.bangor.meander.detectors.stats.cdf.FStatisticAndDegreesFreedom;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 

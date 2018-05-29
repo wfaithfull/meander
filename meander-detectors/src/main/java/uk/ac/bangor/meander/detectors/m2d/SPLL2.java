@@ -1,11 +1,11 @@
-package uk.ac.bangor.meander.detectors.pipes;
+package uk.ac.bangor.meander.detectors.m2d;
 
 import Jama.Matrix;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.clusterers.Cluster;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
-import uk.ac.bangor.meander.detectors.pipes.cdf.ChiSquared;
+import uk.ac.bangor.meander.detectors.stats.cdf.ChiSquared;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPair;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
 import uk.ac.bangor.meander.streams.StreamContext;

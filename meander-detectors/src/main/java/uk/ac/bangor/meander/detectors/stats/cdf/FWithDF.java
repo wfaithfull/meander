@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.pipes.cdf;
+package uk.ac.bangor.meander.detectors.stats.cdf;
 
 import org.apache.commons.math3.distribution.FDistribution;
 import uk.ac.bangor.meander.detectors.Pipe;
