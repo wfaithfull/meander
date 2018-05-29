@@ -3,7 +3,7 @@ package uk.ac.bangor.meander.detectors;
 import moa.classifiers.core.driftdetection.*;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.clusterers.SlowApacheKMeansClusterer;
-import uk.ac.bangor.meander.detectors.controlchart.MR;
+import uk.ac.bangor.meander.detectors.controlchart.pipes.MR;
 import uk.ac.bangor.meander.detectors.m2d.Hotelling;
 import uk.ac.bangor.meander.detectors.m2d.KL;
 import uk.ac.bangor.meander.detectors.m2d.SPLL;

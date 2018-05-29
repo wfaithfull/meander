@@ -4,7 +4,7 @@ import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.ReportPipe;
 import uk.ac.bangor.meander.detectors.Threshold;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
-import uk.ac.bangor.meander.detectors.controlchart.MR;
+import uk.ac.bangor.meander.detectors.controlchart.pipes.MR;
 import uk.ac.bangor.meander.detectors.ensemble.pipes.DecayingMajority;
 import uk.ac.bangor.meander.detectors.ensemble.pipes.SubspaceEnsemble;
 import uk.ac.bangor.meander.detectors.ensemble.support.LogisticDecayFunction;

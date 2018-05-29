@@ -1,10 +1,9 @@
-package uk.ac.bangor.meander.detectors.controlchart;
+package uk.ac.bangor.meander.detectors.controlchart.pipes;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.Setter;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.Threshold;
+import uk.ac.bangor.meander.detectors.controlchart.support.MovingRangeState;
 import uk.ac.bangor.meander.detectors.stats.support.IncrementalStatistics;
 import uk.ac.bangor.meander.streams.StreamContext;
 
@@ -15,13 +14,8 @@ import uk.ac.bangor.meander.streams.StreamContext;
  */
 public class MR {
 
-    @Getter @AllArgsConstructor
-    public static class MRState {
-        double statistic, center, last;
-        IncrementalStatistics statistics;
-    }
 
-    public static class MRReduction implements Pipe<Double, MRState> {
+    public static class MRReduction implements Pipe<Double, MovingRangeState> {
 
         protected double last      = 0;
         protected double statistic = 0;
@@ -56,13 +50,13 @@ public class MR {
         }
 
         @Override
-        public MRState execute(Double value, StreamContext context) {
+        public MovingRangeState execute(Double value, StreamContext context) {
             update(value);
-            return new MRState(statistic, center, last, statistics);
+            return new MovingRangeState(statistic, center, last, statistics);
         }
     }
 
-    public static class MRThreshold extends Threshold<MRState> {
+    public static class MRThreshold extends Threshold<MovingRangeState> {
 
         protected final static double D4_2 = 3.267;
 
@@ -70,7 +64,7 @@ public class MR {
             super(Op.GT, MRThreshold::limit, (mr, ctx) -> mr.getStatistic());
         }
 
-        private static Double limit(MRState mr, StreamContext ctx) {
+        private static Double limit(MovingRangeState mr, StreamContext ctx) {
             if (mr.getStatistics().getN() < 2)
                 return Double.POSITIVE_INFINITY;
 
