@@ -1,5 +1,6 @@
 package uk.ac.bangor.meander.detectors;
 
+import uk.ac.bangor.meander.MeanderException;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 /**
@@ -21,6 +22,11 @@ public interface Pipe<I, O> {
             if(!ready()) {
                 throw new NotReadyException(this);
             } else if(!source.ready()) {
+                try {
+                    source.execute(output, ctx);
+                } catch (MeanderException ex) {
+                    // Nothing to do.
+                }
                 throw new NotReadyException(source);
             }
 
@@ -39,6 +45,11 @@ public interface Pipe<I, O> {
             if(!ready()) {
                 throw new NotReadyException(this);
             } else if(!source.ready()) {
+                try {
+                    source.execute(output, ctx);
+                } catch (MeanderException ex) {
+                    // Nothing to do.
+                }
                 throw new NotReadyException(source);
             }
 
