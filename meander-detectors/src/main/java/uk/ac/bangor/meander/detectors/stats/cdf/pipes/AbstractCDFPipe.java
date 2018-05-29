@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.stats.cdf;
+package uk.ac.bangor.meander.detectors.stats.cdf.pipes;
 
 import uk.ac.bangor.meander.detectors.Pipe;
 

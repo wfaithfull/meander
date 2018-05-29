@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.stats;
+package uk.ac.bangor.meander.detectors.stats.support;
 
 /**
  * @author Will Faithfull

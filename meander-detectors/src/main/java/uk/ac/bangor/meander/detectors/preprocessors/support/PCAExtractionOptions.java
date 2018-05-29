@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.preprocessors;
+package uk.ac.bangor.meander.detectors.preprocessors.support;
 
 /**
  * @author Will Faithfull

@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.stats;
+package uk.ac.bangor.meander.detectors.stats.support;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
@@ -172,24 +172,6 @@ public class PrincipalComponents {
     public Matrix transform(Matrix data) {
         return data.times(coeff);
     }
-
-    /*
-    public PrincipalComponents trimmed(boolean[] keep) {
-
-        int nKeep = 0;
-        for(boolean k : keep) {
-            if(k)
-                nKeep++;
-        }
-
-        Matrix data = new Matrix(this.data.getRowDimension(), nKeep);
-        Matrix eigenvalues = new Matrix(nKeep, nKeep);
-        Matrix coeff;
-
-        for(int r = 0; r < keep.length; r++) {
-
-        }
-    }*/
 
     @AllArgsConstructor
     @Getter

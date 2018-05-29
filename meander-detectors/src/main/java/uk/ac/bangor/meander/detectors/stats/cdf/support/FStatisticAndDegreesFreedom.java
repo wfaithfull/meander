@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.stats.cdf;
+package uk.ac.bangor.meander.detectors.stats.cdf.support;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

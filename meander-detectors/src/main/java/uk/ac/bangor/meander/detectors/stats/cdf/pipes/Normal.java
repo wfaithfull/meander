@@ -1,8 +1,8 @@
-package uk.ac.bangor.meander.detectors.stats.cdf;
+package uk.ac.bangor.meander.detectors.stats.cdf.pipes;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.stats.IncrementalStatistics;
+import uk.ac.bangor.meander.detectors.stats.support.IncrementalStatistics;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 /**

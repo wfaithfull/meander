@@ -8,10 +8,10 @@ import uk.ac.bangor.meander.detectors.m2d.Hotelling;
 import uk.ac.bangor.meander.detectors.m2d.KL;
 import uk.ac.bangor.meander.detectors.m2d.SPLL;
 import uk.ac.bangor.meander.detectors.m2d.SPLL2;
-import uk.ac.bangor.meander.detectors.stats.cdf.ChiSquared;
-import uk.ac.bangor.meander.detectors.stats.cdf.FWithDF;
-import uk.ac.bangor.meander.detectors.windowing.WindowPairClustering;
-import uk.ac.bangor.meander.detectors.windowing.WindowPairPipe;
+import uk.ac.bangor.meander.detectors.stats.cdf.pipes.ChiSquared;
+import uk.ac.bangor.meander.detectors.stats.cdf.pipes.FWithDF;
+import uk.ac.bangor.meander.detectors.windowing.pipes.WindowPairClustering;
+import uk.ac.bangor.meander.detectors.windowing.pipes.WindowPairPipe;
 import uk.ac.bangor.meander.detectors.windowing.support.ClusteringWindowPair;
 import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
 

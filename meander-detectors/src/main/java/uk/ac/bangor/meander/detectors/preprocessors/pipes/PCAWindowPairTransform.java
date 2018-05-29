@@ -1,10 +1,10 @@
-package uk.ac.bangor.meander.detectors.preprocessors;
+package uk.ac.bangor.meander.detectors.preprocessors.pipes;
 
 import Jama.Matrix;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.stats.PrincipalComponents;
-import uk.ac.bangor.meander.detectors.windowing.WindowPairPipe;
+import uk.ac.bangor.meander.detectors.stats.support.PrincipalComponents;
+import uk.ac.bangor.meander.detectors.windowing.pipes.WindowPairPipe;
 import uk.ac.bangor.meander.detectors.windowing.support.FixedWindow;
 import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;

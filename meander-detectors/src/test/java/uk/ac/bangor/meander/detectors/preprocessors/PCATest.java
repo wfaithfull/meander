@@ -3,7 +3,7 @@ package uk.ac.bangor.meander.detectors.preprocessors;
 import Jama.Matrix;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.bangor.meander.detectors.stats.PrincipalComponents;
+import uk.ac.bangor.meander.detectors.stats.support.PrincipalComponents;
 
 /**
  * @author Will Faithfull

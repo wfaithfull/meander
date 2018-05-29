@@ -5,6 +5,7 @@ import org.junit.Test;
 import uk.ac.bangor.meander.detectors.clusterers.Cluster;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.clusterers.StreamClusterer;
+import uk.ac.bangor.meander.detectors.windowing.pipes.WindowClustering;
 import uk.ac.bangor.meander.detectors.windowing.support.Window;
 import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
 

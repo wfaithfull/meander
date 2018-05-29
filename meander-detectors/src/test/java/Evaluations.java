@@ -5,19 +5,19 @@ import uk.ac.bangor.meander.detectors.ReportPipe;
 import uk.ac.bangor.meander.detectors.Threshold;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.controlchart.MR;
-import uk.ac.bangor.meander.detectors.ensemble.DecayingMajority;
-import uk.ac.bangor.meander.detectors.ensemble.LogisticDecayFunction;
-import uk.ac.bangor.meander.detectors.ensemble.SubspaceEnsemble;
+import uk.ac.bangor.meander.detectors.ensemble.pipes.DecayingMajority;
+import uk.ac.bangor.meander.detectors.ensemble.pipes.SubspaceEnsemble;
+import uk.ac.bangor.meander.detectors.ensemble.support.LogisticDecayFunction;
 import uk.ac.bangor.meander.detectors.m2d.Hotelling;
 import uk.ac.bangor.meander.detectors.m2d.KL;
 import uk.ac.bangor.meander.detectors.m2d.SPLL;
 import uk.ac.bangor.meander.detectors.m2d.SPLL2;
-import uk.ac.bangor.meander.detectors.preprocessors.PCAExtractionOptions;
-import uk.ac.bangor.meander.detectors.preprocessors.PCAFeatureSelector;
-import uk.ac.bangor.meander.detectors.stats.cdf.ChiSquared;
-import uk.ac.bangor.meander.detectors.stats.cdf.FWithDF;
-import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
-import uk.ac.bangor.meander.detectors.windowing.WindowPairPipe;
+import uk.ac.bangor.meander.detectors.preprocessors.pipes.PCAFeatureSelector;
+import uk.ac.bangor.meander.detectors.preprocessors.support.PCAExtractionOptions;
+import uk.ac.bangor.meander.detectors.stats.cdf.pipes.ChiSquared;
+import uk.ac.bangor.meander.detectors.stats.cdf.pipes.FWithDF;
+import uk.ac.bangor.meander.detectors.windowing.pipes.WindowPairClustering;
+import uk.ac.bangor.meander.detectors.windowing.pipes.WindowPairPipe;
 import uk.ac.bangor.meander.detectors.windowing.support.ClusteringWindowPair;
 import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
 import uk.ac.bangor.meander.evaluators.Evaluation;
@@ -55,7 +55,7 @@ public class Evaluations {
 
         Pipe<Double[], Boolean> detector = SPLL2.detector(W, 3);
 
-        Pipe kl = new ClusteringWindowPairPipe(W, () -> new KMeansStreamClusterer(3))
+        Pipe kl = new WindowPairClustering(W, () -> new KMeansStreamClusterer(3))
                 .then(new ClusteringWindowPair.Distribution())
                 .then(new KL.KLReduction())
                 .then(new ReportPipe<>(reporter::statistic, KL.KLState::getStatistic))
