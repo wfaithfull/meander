@@ -7,10 +7,11 @@ import uk.ac.bangor.meander.detectors.controlchart.MR;
 import uk.ac.bangor.meander.detectors.ensemble.DecayingMajority;
 import uk.ac.bangor.meander.detectors.ensemble.LogisticDecayFunction;
 import uk.ac.bangor.meander.detectors.ensemble.SubspaceEnsemble;
-import uk.ac.bangor.meander.detectors.pipes.*;
-import uk.ac.bangor.meander.detectors.pipes.cdf.ChiSquared;
-import uk.ac.bangor.meander.detectors.pipes.cdf.FWithDF;
-import uk.ac.bangor.meander.detectors.preprocessors.PCA;
+import uk.ac.bangor.meander.detectors.m2d.*;
+import uk.ac.bangor.meander.detectors.preprocessors.PCAExtractionOptions;
+import uk.ac.bangor.meander.detectors.preprocessors.PCAFeatureSelector;
+import uk.ac.bangor.meander.detectors.stats.cdf.ChiSquared;
+import uk.ac.bangor.meander.detectors.stats.cdf.FWithDF;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPair;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
 import uk.ac.bangor.meander.detectors.windowing.WindowPair;
@@ -59,14 +60,14 @@ public class Evaluations {
 
         Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MR.MRReduction().then(new MR.MRThreshold());
         Pipe<Double[], Boolean> subspace =
-                new PCA.PCAFeatureSelector()
+                new PCAFeatureSelector(true)
                         .then(new SubspaceEnsemble(mrSupplier)
                 .then(new DecayingMajority(new LogisticDecayFunction()))
                 .then(new ReportPipe<>(reporter::statistic, Function.identity()))
                                 .then(Threshold.greaterThan(.25).reportThreshold(reporter::ucl)));
 
         Pipe<Double[], Boolean> hotelling =
-                new PCA.PCAFeatureSelector(.2, PCA.ExtractionOptions.KEEP_LEAST_VARIANT).then(
+                new PCAFeatureSelector(.2, PCAExtractionOptions.KEEP_LEAST_VARIANT, true).then(
                         new WindowPairPipe(100)
                                 .then(new Hotelling.TsqReduction().then(new ReportPipe<>(reporter::statistic, f -> f.getStatistic())))
                                 .then(new FWithDF().complementary())
