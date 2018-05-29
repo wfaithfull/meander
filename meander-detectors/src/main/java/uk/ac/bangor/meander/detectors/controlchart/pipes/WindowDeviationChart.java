@@ -1,7 +1,9 @@
-package uk.ac.bangor.meander.detectors.controlchart;
+package uk.ac.bangor.meander.detectors.controlchart.pipes;
 
+import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.windowing.support.FixedWindow;
 import uk.ac.bangor.meander.detectors.windowing.support.Window;
+import uk.ac.bangor.meander.streams.StreamContext;
 
 /**
  * The control-chart inspired method from
@@ -12,7 +14,7 @@ import uk.ac.bangor.meander.detectors.windowing.support.Window;
  *
  * @author Will Faithfull
  */
-public class WindowDeviationChart {
+public class WindowDeviationChart implements Pipe<Double, Boolean> {
 
     private Window<Double> window;
     private double         sqrt_T;
@@ -66,5 +68,11 @@ public class WindowDeviationChart {
         }
 
         return Math.sqrt(var / (data.length-1));
+    }
+
+    @Override
+    public Boolean execute(Double value, StreamContext context) {
+        update(value);
+        return isChangeDetected();
     }
 }

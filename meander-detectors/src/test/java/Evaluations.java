@@ -4,7 +4,8 @@ import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.ReportPipe;
 import uk.ac.bangor.meander.detectors.Threshold;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
-import uk.ac.bangor.meander.detectors.controlchart.MR;
+import uk.ac.bangor.meander.detectors.controlchart.pipes.MovingRange;
+import uk.ac.bangor.meander.detectors.controlchart.pipes.MovingRangeThreshold;
 import uk.ac.bangor.meander.detectors.ensemble.pipes.DecayingMajority;
 import uk.ac.bangor.meander.detectors.ensemble.pipes.SubspaceEnsemble;
 import uk.ac.bangor.meander.detectors.ensemble.support.LogisticDecayFunction;
@@ -62,7 +63,7 @@ public class Evaluations {
                 .then(new Threshold<>(Threshold.Op.GT, new KL.LikelihoodRatioThreshold(), new KL.KLStateStatistic())
                         .reportThreshold(reporter::ucl));
 
-        Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MR.MRReduction().then(new MR.MRThreshold());
+        Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MovingRange().then(new MovingRangeThreshold());
         Pipe<Double[], Boolean> subspace =
                 new PCAFeatureSelector(true)
                         .then(new SubspaceEnsemble(mrSupplier)

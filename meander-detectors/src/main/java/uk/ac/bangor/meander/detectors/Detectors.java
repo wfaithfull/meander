@@ -3,7 +3,9 @@ package uk.ac.bangor.meander.detectors;
 import moa.classifiers.core.driftdetection.*;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.clusterers.SlowApacheKMeansClusterer;
-import uk.ac.bangor.meander.detectors.controlchart.MR;
+import uk.ac.bangor.meander.detectors.controlchart.pipes.MovingRange;
+import uk.ac.bangor.meander.detectors.controlchart.pipes.MovingRangeThreshold;
+import uk.ac.bangor.meander.detectors.controlchart.support.MovingRangeState;
 import uk.ac.bangor.meander.detectors.m2d.Hotelling;
 import uk.ac.bangor.meander.detectors.m2d.KL;
 import uk.ac.bangor.meander.detectors.m2d.SPLL;
@@ -127,14 +129,14 @@ public class Detectors {
     public static class Univariate {
 
         public static Pipe<Double, Boolean> movingRangeChart() {
-            return new MR.MRReduction()
-                    .then(new MR.MRThreshold());
+            return new MovingRange()
+                    .then(new MovingRangeThreshold());
         }
 
         public static Pipe<Double, Boolean> movingRangeChart(ChartReporter reporter) {
-            return new MR.MRReduction()
-                    .then(new ReportPipe<>(reporter::statistic, MR.MRState::getStatistic))
-                    .then(new MR.MRThreshold().reportThreshold(reporter::ucl));
+            return new MovingRange()
+                    .then(new ReportPipe<>(reporter::statistic, MovingRangeState::getStatistic))
+                    .then(new MovingRangeThreshold().reportThreshold(reporter::ucl));
         }
 
         public static Pipe<Double, Boolean> cusum() {
