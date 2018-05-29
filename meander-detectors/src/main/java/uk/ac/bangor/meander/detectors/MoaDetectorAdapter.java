@@ -1,7 +1,6 @@
-package uk.ac.bangor.meander.detectors.m2d;
+package uk.ac.bangor.meander.detectors;
 
 import moa.classifiers.core.driftdetection.*;
-import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.ArrayList;
