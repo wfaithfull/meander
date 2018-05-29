@@ -5,30 +5,39 @@ import lombok.Getter;
 import lombok.Setter;
 import uk.ac.bangor.meander.transitions.Transition;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Will Faithfull
  * Context class which holds information about the current place in the stream, as well as the labels
  * for the source and class of the last example.
  */
+@Getter
 public class StreamContext {
 
-    @Getter private                              long             index;
-    @Getter @Setter                              int              sequence;
-    @Getter @Setter                              int              label;
-    @Getter @Setter                              List<Transition> transitions;
-    private                                      Transition       mostRecent;
-    @Getter @Setter(AccessLevel.PACKAGE) private double[]         sourcePriors;
-    private                                      List<double[]>   classPriors;
-    @Getter private                              int              dimensionality;
-    @Getter @Setter(AccessLevel.PACKAGE) private boolean          finished;
-    @Getter @Setter private                      Integer[]        changeLabels;
+    private long             index;
+    @Setter
+            int              sequence;
+    @Setter
+            int              label;
+    @Setter
+            List<Transition> transitions;
+    private Transition       mostRecent;
+    @Setter(AccessLevel.PACKAGE)
+    private double[]         sourcePriors;
+    private List<double[]>   classPriors;
+    @Setter
+    private int              dimensionality;
+    @Setter(AccessLevel.PACKAGE)
+    private boolean          finished;
+    @Setter
+    private Integer[]        changeLabels;
+    private long             lastDetection;
+    private boolean[]        keep;
+
     @Getter
-    private                                      long             lastDetection;
+    private Map<Class<?>, Object> cache = new ConcurrentHashMap<>();
 
     StreamContext() {
         index = 0;
@@ -84,6 +93,18 @@ public class StreamContext {
     void transition(Transition transition) {
         transitions.add(transition);
         mostRecent = transition;
+    }
+
+    public void setKeep(boolean[] keep) {
+        this.keep = keep;
+    }
+
+    public boolean isTrimmed() {
+        for (boolean keepFeature : keep) {
+            if (!keepFeature)
+                return true;
+        }
+        return false;
     }
 
     public void detection() {
