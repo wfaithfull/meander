@@ -1,6 +1,5 @@
-package uk.ac.bangor.meander.detectors.m2d;
+package uk.ac.bangor.meander.detectors;
 
-import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.function.BiFunction;

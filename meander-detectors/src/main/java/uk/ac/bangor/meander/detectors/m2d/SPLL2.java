@@ -3,6 +3,7 @@ package uk.ac.bangor.meander.detectors.m2d;
 import Jama.Matrix;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
+import uk.ac.bangor.meander.detectors.Threshold;
 import uk.ac.bangor.meander.detectors.clusterers.Cluster;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.stats.cdf.ChiSquared;
