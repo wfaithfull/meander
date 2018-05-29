@@ -25,7 +25,7 @@ public class Detectors {
             return new WindowPairClustering(size, () -> new KMeansStreamClusterer(K))
                     .then(new ClusteringWindowPair.Distribution())
                     .then(new KL())
-                    .then(new Threshold<>(Threshold.Op.GT, new KLLikelihoodRatioThreshold(), new KLStateStatistic()));
+                    .then(new Threshold<>(Threshold.Op.GT, new KLLikelihoodRatio(), new KLStateStatistic()));
         }
 
         public static Pipe<Double[], Boolean> klDetector(int size, int K, ChartReporter reporter) {
@@ -33,7 +33,7 @@ public class Detectors {
                     .then(new ClusteringWindowPair.Distribution())
                     .then(new KL())
                     .then(
-                            new Threshold<>(Threshold.Op.GT, new KLLikelihoodRatioThreshold(), new KLStateStatistic())
+                            new Threshold<>(Threshold.Op.GT, new KLLikelihoodRatio(), new KLStateStatistic())
                                     .report(reporter::ucl, reporter::statistic)
                     );
         }

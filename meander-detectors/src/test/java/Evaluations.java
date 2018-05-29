@@ -58,7 +58,7 @@ public class Evaluations {
                 .then(new ClusteringWindowPair.Distribution())
                 .then(new KL())
                 .then(new ReportPipe<>(reporter::statistic, KLState::getStatistic))
-                .then(new Threshold<>(Threshold.Op.GT, new KLLikelihoodRatioThreshold(), new KLStateStatistic())
+                .then(new Threshold<>(Threshold.Op.GT, new KLLikelihoodRatio(), new KLStateStatistic())
                         .reportThreshold(reporter::ucl));
 
         Supplier<Pipe<Double, Boolean>> mrSupplier = () -> new MovingRange().then(new MovingRangeThreshold());

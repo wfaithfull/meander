@@ -7,7 +7,7 @@ import uk.ac.bangor.meander.streams.StreamContext;
 /**
  * @author Will Faithfull
  */
-public class KLLikelihoodRatioThreshold implements Pipe<KLState, Double> {
+public class KLLikelihoodRatio implements Pipe<KLState, Double> {
     @Override
     public Double execute(KLState value, StreamContext context) {
 
