@@ -3,6 +3,9 @@ package uk.ac.bangor.meander.detectors.windowing;
 import lombok.Getter;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.clusterers.StreamClusterer;
+import uk.ac.bangor.meander.detectors.windowing.support.ClusteringWindowPair;
+import uk.ac.bangor.meander.detectors.windowing.support.Window;
+import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.function.BiFunction;

@@ -7,7 +7,7 @@ import org.apache.commons.math3.stat.correlation.Covariance;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.stats.cdf.FStatisticAndDegreesFreedom;
-import uk.ac.bangor.meander.detectors.windowing.WindowPair;
+import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 /**

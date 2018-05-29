@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import org.apache.commons.math3.util.FastMath;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.windowing.DistributionPair;
+import uk.ac.bangor.meander.detectors.windowing.support.DistributionPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.concurrent.ThreadLocalRandom;

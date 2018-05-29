@@ -1,4 +1,4 @@
-package uk.ac.bangor.meander.detectors.windowing;
+package uk.ac.bangor.meander.detectors.windowing.support;
 
 import lombok.Getter;
 import uk.ac.bangor.meander.detectors.Pipe;

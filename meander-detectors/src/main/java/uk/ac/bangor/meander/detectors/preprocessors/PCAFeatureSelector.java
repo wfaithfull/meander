@@ -4,7 +4,7 @@ import Jama.Matrix;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.stats.PrincipalComponents;
-import uk.ac.bangor.meander.detectors.windowing.FixedWindow;
+import uk.ac.bangor.meander.detectors.windowing.support.FixedWindow;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 public class PCAFeatureSelector implements Pipe<Double[], Double[]> {

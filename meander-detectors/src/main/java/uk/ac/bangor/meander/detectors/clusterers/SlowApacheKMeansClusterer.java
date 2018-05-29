@@ -10,8 +10,8 @@ import org.apache.commons.math3.random.RandomGeneratorFactory;
 import org.apache.commons.math3.stat.correlation.Covariance;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import uk.ac.bangor.meander.detectors.CollectionUtils;
-import uk.ac.bangor.meander.detectors.windowing.FixedWindow;
-import uk.ac.bangor.meander.detectors.windowing.Window;
+import uk.ac.bangor.meander.detectors.windowing.support.FixedWindow;
+import uk.ac.bangor.meander.detectors.windowing.support.Window;
 
 import java.util.ArrayList;
 import java.util.Arrays;

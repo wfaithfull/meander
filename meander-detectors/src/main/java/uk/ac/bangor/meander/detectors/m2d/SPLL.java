@@ -4,7 +4,7 @@ import lombok.extern.java.Log;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 import uk.ac.bangor.meander.detectors.AbstractKMeansQuantizingDetector;
 import uk.ac.bangor.meander.detectors.Pipe;
-import uk.ac.bangor.meander.detectors.windowing.WindowPair;
+import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 /**

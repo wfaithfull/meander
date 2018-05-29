@@ -5,6 +5,7 @@ import uk.ac.bangor.meander.detectors.CollectionUtils;
 import uk.ac.bangor.meander.detectors.Pipe;
 import uk.ac.bangor.meander.detectors.clusterers.Clustering;
 import uk.ac.bangor.meander.detectors.clusterers.StreamClusterer;
+import uk.ac.bangor.meander.detectors.windowing.support.FixedWindow;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.LinkedList;

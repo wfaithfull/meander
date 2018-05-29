@@ -1,6 +1,7 @@
 package uk.ac.bangor.meander.detectors.windowing;
 
 import uk.ac.bangor.meander.detectors.Pipe;
+import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 /**

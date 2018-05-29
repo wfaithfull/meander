@@ -7,8 +7,8 @@ import uk.ac.bangor.meander.detectors.Threshold;
 import uk.ac.bangor.meander.detectors.clusterers.Cluster;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.stats.cdf.ChiSquared;
-import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPair;
 import uk.ac.bangor.meander.detectors.windowing.ClusteringWindowPairPipe;
+import uk.ac.bangor.meander.detectors.windowing.support.ClusteringWindowPair;
 import uk.ac.bangor.meander.streams.StreamContext;
 
 import java.util.List;

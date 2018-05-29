@@ -1,7 +1,7 @@
 package uk.ac.bangor.meander.detectors.controlchart;
 
-import uk.ac.bangor.meander.detectors.windowing.FixedWindow;
-import uk.ac.bangor.meander.detectors.windowing.Window;
+import uk.ac.bangor.meander.detectors.windowing.support.FixedWindow;
+import uk.ac.bangor.meander.detectors.windowing.support.Window;
 
 /**
  * The control-chart inspired method from

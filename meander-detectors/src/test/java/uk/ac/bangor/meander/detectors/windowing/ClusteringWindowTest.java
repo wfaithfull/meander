@@ -5,11 +5,11 @@ import org.junit.Test;
 import uk.ac.bangor.meander.detectors.clusterers.Cluster;
 import uk.ac.bangor.meander.detectors.clusterers.KMeansStreamClusterer;
 import uk.ac.bangor.meander.detectors.clusterers.StreamClusterer;
+import uk.ac.bangor.meander.detectors.windowing.support.Window;
+import uk.ac.bangor.meander.detectors.windowing.support.WindowPair;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Will Faithfull
