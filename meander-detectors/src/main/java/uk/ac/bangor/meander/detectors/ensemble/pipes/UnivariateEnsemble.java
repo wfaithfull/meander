@@ -5,8 +5,9 @@ import uk.ac.bangor.meander.detectors.Pipe;
 /**
  * @author Will Faithfull
  */
-public class MultivariateEnsemble extends BasicEnsemble<Double[]> {
-    public MultivariateEnsemble(Pipe<Double[], Boolean>... detectors) {
+public class UnivariateEnsemble extends BasicEnsemble<Double> {
+
+    public UnivariateEnsemble(Pipe<Double, Boolean>... detectors) {
         super(detectors);
     }
 }
